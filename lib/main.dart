@@ -18,7 +18,7 @@ import 'package:flutter_dmzj/views/user/personal_page.dart';
 import 'package:flutter_dmzj/views/user/user_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'app/app_theme.dart';
@@ -46,9 +46,11 @@ void main() async {
 }
 
 Future initDatabase() async {
-  var databasesPath = await getDatabasesPath();
+  var databasesPath = await databaseFactory.getDatabasesPath();
   // File(databasesPath+"/nsplayer.db").deleteSync();
-  var db = await openDatabase(databasesPath + "/comic_history.db", version: 1,
+  var db = await databaseFactory.openDatabase(databasesPath + "/comic_history.db",
+      options: OpenDatabaseOptions(
+      version: 1,
       onCreate: (Database _db, int version) async {
     await _db.execute('''
 create table $comicHistoryTable ( 
@@ -71,7 +73,7 @@ $comicDownloadColumnCount integer ,
 $comicDownloadColumnSavePath text ,
 $comicDownloadColumnUrls text )
 ''');
-  });
+  }));
 
   ComicHistoryProvider.db = db;
   ComicDownloadProvider.db = db;

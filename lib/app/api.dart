@@ -339,7 +339,8 @@ class Api {
   }
 
   static String defaultParameter() {
-    return "channel=${Platform.operatingSystem}&version$version&timestamp=$timeStamp";
+    //return "channel=${Platform.operatingSystem}&version$version&timestamp=$timeStamp";
+    return "channel=android&version$version&timestamp=$timeStamp";
   }
 
   static String sign(String content, String mode) {

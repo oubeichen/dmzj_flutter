@@ -49,6 +49,7 @@ class ComicRecommendState extends State<ComicRecommend>
         _hideBanner = event;
       });
     });
+    print("ComicRecommend: initState");
     loadData();
   }
 
@@ -393,8 +394,12 @@ class ComicRecommendState extends State<ComicRecommend>
         return;
       }
       _loading = true;
+      print("ComicRecommend: loadData: ${Api.comicRecommend}");
       var response = await http.get(Uri.parse(Api.comicRecommend));
+      var body = response.body;
+      print("ComicRecommend: loadData body: $body");
       List jsonMap = jsonDecode(response.body);
+
       //Banner
       {
         List bannerItem = jsonMap[0]["data"];
@@ -508,7 +513,7 @@ class ComicRecommendState extends State<ComicRecommend>
       await loadLike();
       await loadMySub();
     } catch (e) {
-      print(e);
+      print("loadData: " + e.toString());
     } finally {
       _loading = false;
     }

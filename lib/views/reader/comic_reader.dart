@@ -20,7 +20,9 @@ import 'package:flutter_dmzj/models/comic/comic_detail_model.dart';
 import 'package:flutter_dmzj/models/comic/comic_web_chapter_detail.dart';
 import 'package:flutter_dmzj/protobuf/comic/detail_response.pb.dart';
 import 'package:flutter_dmzj/sql/comic_history.dart';
+import 'package:flutter_dmzj/views/other/PlatformBattery.dart';
 import 'package:flutter_dmzj/views/reader/comic_tc.dart';
+import 'package:flutter_dmzj/widgets/GestureZoomBox.dart';
 import 'package:flutter_dmzj/widgets/comic_view.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
@@ -52,7 +54,7 @@ class ComicReaderPage extends StatefulWidget {
 
 class _ComicReaderPageState extends State<ComicReaderPage> {
   ComicDetailChapterInfoResponse _currentItem;
-  Battery _battery = Battery();
+  Battery _battery = PlatformBattery();
   Connectivity _connectivity = Connectivity();
   String _batteryStr = "-%";
   String _networkState = "";
@@ -545,8 +547,9 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   ScrollController _scrollController = ScrollController();
 
   Widget createHorizontalReader() {
-    return InkWell(
-      onTap: () {
+    return GestureZoomBox(
+      onPressed: () {
+        print("GestureZoomBox onPressed::::");
         setState(() {
           if (_showChapters) {
             _showChapters = false;
@@ -555,6 +558,8 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
           _showControls = !_showControls;
         });
       },
+      maxScale: 5.0,
+      doubleTapScale: 2.0,
       child: Container(
         color: Colors.black,
         child: ComicView.builder(
@@ -636,8 +641,8 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   }
 
   Widget createVerticalReader() {
-    return InkWell(
-      onTap: () {
+    return GestureZoomBox(
+      onPressed: () {
         setState(() {
           if (_showChapters) {
             _showChapters = false;
@@ -646,6 +651,8 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
           _showControls = !_showControls;
         });
       },
+      maxScale: 5.0,
+      doubleTapScale: 2.0,
       child: EasyRefresh(
         scrollController: _scrollController,
         onRefresh: () async {

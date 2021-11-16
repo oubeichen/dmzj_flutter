@@ -218,15 +218,14 @@ class ComicSearchBarDelegate extends SearchDelegate<String> {
 
   Future<List<ComicNSSearchItem>> loadData() async {
     try {
-      var url = Api.comicSacgSearch(this.query);
+      var url = Api.comicNSSearch(this.query);
       print("search loadData: $url");
       var response = await http.get(Uri.parse(url));
       print("search loadData body:${response.body}");
-      var jsonMap = jsonDecode(
-          response.body.substring(20, response.body.lastIndexOf(';')));
-      List ls = jsonMap;
+      var jsonMap = jsonDecode(response.body);
+      List ls = jsonMap["data"];
       List<ComicNSSearchItem> detail =
-          ls.map((i) => ComicNSSearchItem.fromJson2(i)).toList();
+          ls.map((i) => ComicNSSearchItem.fromJson(i)).toList();
       if (detail != null) {
         return detail;
       }

@@ -37,6 +37,8 @@ class Utils {
   static EventBus changeNovelHomeTabIndex = EventBus();
   static EventBus changHistory = EventBus();
   static EventBus changeHideBanner = EventBus();
+  static bool isMobilePlatform = Platform.isAndroid || Platform.isIOS;
+
   static void showSnackbarWithAction(
       BuildContext context, String content, String action, Function onPressed) {
     final snackBar = new SnackBar(

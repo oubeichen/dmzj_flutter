@@ -20,7 +20,7 @@ import 'package:flutter_dmzj/models/comic/comic_detail_model.dart';
 import 'package:flutter_dmzj/models/comic/comic_web_chapter_detail.dart';
 import 'package:flutter_dmzj/protobuf/comic/detail_response.pb.dart';
 import 'package:flutter_dmzj/sql/comic_history.dart';
-import 'package:flutter_dmzj/views/other/PlatformBattery.dart';
+import 'package:flutter_dmzj/views/other/platform_methods.dart';
 import 'package:flutter_dmzj/views/reader/comic_tc.dart';
 import 'package:flutter_dmzj/widgets/GestureZoomBox.dart';
 import 'package:flutter_dmzj/widgets/comic_view.dart';
@@ -68,44 +68,20 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
     if (ConfigHelper.getComicShowStatusBar()) {
       SystemChrome.setEnabledSystemUIOverlays([]);
     }
-    //亮度信息
-    if (!ConfigHelper.getComicSystemBrightness()) {
-      Screen.setBrightness(ConfigHelper.getComicBrightness());
+    if (Utils.isMobilePlatform) {
+      //亮度信息
+      if (!ConfigHelper.getComicSystemBrightness()) {
+        Screen.setBrightness(ConfigHelper.getComicBrightness());
+      }
+      Screen.keepOn(ConfigHelper.getComicWakelock());
     }
-    Screen.keepOn(ConfigHelper.getComicWakelock());
 
     _currentItem = widget.item;
 
-    _connectivity.checkConnectivity().then((e) {
-      var str = "";
-      if (e == ConnectivityResult.mobile) {
-        str = "移动网络";
-      } else if (e == ConnectivityResult.wifi) {
-        str = "WIFI";
-      } else if (e == ConnectivityResult.none) {
-        str = "无网络";
-      } else {
-        str = "未知网络";
-      }
-      setState(() {
-        _networkState = str;
-      });
-    });
-    _connectivity.onConnectivityChanged.listen((e) {
-      var str = "";
-      if (e == ConnectivityResult.mobile) {
-        str = "移动网络";
-      } else if (e == ConnectivityResult.wifi) {
-        str = "WIFI";
-      } else if (e == ConnectivityResult.none) {
-        str = "无网络";
-      } else {
-        str = "未知网络";
-      }
-      setState(() {
-        _networkState = str;
-      });
-    });
+    if (Utils.isMobilePlatform) {
+      initConnectivity();
+    }
+
     _battery.batteryLevel.then((e) {
       setState(() {
         _batteryStr = e.toString() + "%";
@@ -151,7 +127,9 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   @override
   void dispose() {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    Screen.keepOn(false);
+    if (Utils.isMobilePlatform) {
+      Screen.keepOn(false);
+    }
     int page = 1;
     if (!ConfigHelper.getComicVertical() ?? false) {
       print(_selectIndex);
@@ -789,7 +767,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                SwitchListTile(
+                Utils.isMobilePlatform ? SwitchListTile(
                     title: Text(
                       "使用系统亮度",
                       style: TextStyle(color: Colors.white),
@@ -799,7 +777,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
                     onChanged: (e) {
                       Provider.of<AppSetting>(context, listen: false)
                           .changeComicSystemBrightness(e);
-                    }),
+                    }): Container(),
                 !Provider.of<AppSetting>(context).comicSystemBrightness
                     ? Row(
                         children: <Widget>[
@@ -866,7 +844,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
                               .changeReadReverse(e);
                         })
                     : Container(),
-                SwitchListTile(
+                Utils.isMobilePlatform ? SwitchListTile(
                     title: Text(
                       "屏幕常亮",
                       style: TextStyle(color: Colors.white),
@@ -876,7 +854,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
                       Screen.keepOn(e);
                       Provider.of<AppSetting>(context, listen: false)
                           .changeComicWakelock(e);
-                    }),
+                    }): Container(),
                 SwitchListTile(
                     title: Text(
                       "全屏阅读",
@@ -1024,5 +1002,38 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
       _currentItem = widget.chapters[widget.chapters.indexOf(_currentItem) - 1];
     });
     await loadData();
+  }
+
+  void initConnectivity() {
+    _connectivity.checkConnectivity().then((e) {
+      var str = "";
+      if (e == ConnectivityResult.mobile) {
+        str = "移动网络";
+      } else if (e == ConnectivityResult.wifi) {
+        str = "WIFI";
+      } else if (e == ConnectivityResult.none) {
+        str = "无网络";
+      } else {
+        str = "未知网络";
+      }
+      setState(() {
+        _networkState = str;
+      });
+    });
+    _connectivity.onConnectivityChanged.listen((e) {
+      var str = "";
+      if (e == ConnectivityResult.mobile) {
+        str = "移动网络";
+      } else if (e == ConnectivityResult.wifi) {
+        str = "WIFI";
+      } else if (e == ConnectivityResult.none) {
+        str = "无网络";
+      } else {
+        str = "未知网络";
+      }
+      setState(() {
+        _networkState = str;
+      });
+    });
   }
 }

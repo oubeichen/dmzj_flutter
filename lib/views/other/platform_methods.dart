@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:battery/battery.dart';
+import 'package:connectivity/connectivity.dart';
 
 class PlatformBattery extends Battery {
 

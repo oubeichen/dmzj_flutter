@@ -327,7 +327,8 @@ class Api {
       "$apiHost/search/hot/1.json?${defaultParameter()}";
 
   static String comicNSSearch(String keyword) {
-    return "https://dmzj.nsapps.cn/api/dmzj/search?keyword=${Uri.encodeComponent(keyword)}";
+    //return "https://dmzj.nsapps.cn/api/dmzj/search?keyword=${Uri.encodeComponent(keyword)}";
+    return "http://sacg.dmzj.com/comicsum/search.php?s=${Uri.encodeComponent(keyword)}";
   }
 
   static String comicSacgSearch(String keyword) {

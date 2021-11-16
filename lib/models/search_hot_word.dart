@@ -23,3 +23,11 @@ String  toString() {
     return json.encode(this);
   }
 }
+
+class SearchSuggestWords {
+
+  List<String> historyKeys;
+  List<SearchHotWord> hotWords;
+
+  SearchSuggestWords(this.historyKeys, this.hotWords);
+}

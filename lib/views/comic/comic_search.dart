@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/api.dart';
+import 'package:flutter_dmzj/app/config_helper.dart';
 import 'package:flutter_dmzj/app/utils.dart';
 import 'package:flutter_dmzj/models/comic/comic_ns_search_item.dart';
 import 'package:flutter_dmzj/models/search_hot_word.dart';
@@ -73,10 +74,10 @@ class ComicSearchBarDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return FutureBuilder<List<SearchHotWord>>(
+    return FutureBuilder<SearchSuggestWords>(
       future: loadHotWord(),
       builder:
-          (BuildContext context, AsyncSnapshot<List<SearchHotWord>> snapshot) {
+          (BuildContext context, AsyncSnapshot<SearchSuggestWords> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
             return Container();
@@ -97,6 +98,23 @@ class ComicSearchBarDelegate extends SearchDelegate<String> {
                   Container(
                     padding: EdgeInsets.all(12),
                     child: Text(
+                      "搜索历史",
+                      style:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Wrap(
+                        children: snapshot.data.historyKeys
+                            .map((f) =>
+                            createHistoryKeyItem(context, f))
+                            .toList(),
+                      )),
+
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    child: Text(
                       "热门搜索",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -105,7 +123,7 @@ class ComicSearchBarDelegate extends SearchDelegate<String> {
                   Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: Wrap(
-                        children: snapshot.data
+                        children: snapshot.data.hotWords
                             .map((f) =>
                                 createWorditem(context, f.name, f.id, type: 1))
                             .toList(),
@@ -116,6 +134,29 @@ class ComicSearchBarDelegate extends SearchDelegate<String> {
         }
         return null; // unreachable
       },
+    );
+  }
+
+  Widget createHistoryKeyItem(BuildContext context, String title,
+      {int type = 1}) {
+    return Padding(
+      padding: EdgeInsets.all(4),
+      child: InkWell(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Theme.of(context).accentColor)),
+          child: Text(
+            title,
+            style: TextStyle(color: Theme.of(context).accentColor),
+          ),
+        ),
+        onTap: () {
+          this.query = title;
+          showResults(context);
+        },
+      ),
     );
   }
 
@@ -217,15 +258,27 @@ class ComicSearchBarDelegate extends SearchDelegate<String> {
   }
 
   Future<List<ComicNSSearchItem>> loadData() async {
+    var key = this.query;
+    if (key.isNotEmpty) {
+      var keys = ConfigHelper.getComicSearchKeys();
+      keys.remove(key);
+      keys.insert(0, key);
+      ConfigHelper.setComicSearchKeys(keys);
+    }
+
     try {
       var url = Api.comicNSSearch(this.query);
       print("search loadData: $url");
       var response = await http.get(Uri.parse(url));
-      print("search loadData body:${response.body}");
-      var jsonMap = jsonDecode(response.body);
-      List ls = jsonMap["data"];
+      var bodyStr = response.body;
+      print("search loadData body:$bodyStr");
+      var startIndex = bodyStr.indexOf("=") + 1;
+      var dataStr = bodyStr.substring(startIndex, bodyStr.length - 1);
+      print("search loadData dataStr:$dataStr");
+      var jsonList = jsonDecode(dataStr);
+      List ls = jsonList;
       List<ComicNSSearchItem> detail =
-          ls.map((i) => ComicNSSearchItem.fromJson(i)).toList();
+          ls.map((i) => ComicNSSearchItem.fromJson2(i)).toList();
       if (detail != null) {
         return detail;
       }
@@ -236,19 +289,21 @@ class ComicSearchBarDelegate extends SearchDelegate<String> {
     return [];
   }
 
-  Future<List<SearchHotWord>> loadHotWord() async {
+  Future<SearchSuggestWords> loadHotWord() async {
+    List<String> historyKeys = ConfigHelper.getComicSearchKeys();
+
     try {
       var response = await http.get(Uri.parse(Api.comicSearchHotWord));
       List ls = jsonDecode(response.body);
       List<SearchHotWord> detail =
           ls.map((i) => SearchHotWord.fromJson(i)).toList();
       if (detail != null) {
-        return detail;
+        return SearchSuggestWords(historyKeys, detail);
       }
     } catch (e) {
       print(e);
     }
-    return [];
+    return SearchSuggestWords(historyKeys, []);
   }
 
   @override

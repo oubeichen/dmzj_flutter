@@ -144,8 +144,17 @@ class ConfigHelper {
     return prefs.getBool("ComicSystemBrightness") ?? true;
   }
 
+  // 搜索历史词
   static void setComicSystemBrightness(bool value) {
     prefs.setBool("ComicSystemBrightness", value);
+  }
+
+  static List<String> getComicSearchKeys() {
+    return prefs.getStringList("ComicSearchKeys") ?? List.empty(growable: true);
+  }
+
+  static void setComicSearchKeys(List<String> keys) {
+    prefs.setStringList("ComicSearchKeys", keys);
   }
 
   /// 小说阅读记录

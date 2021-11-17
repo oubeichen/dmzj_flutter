@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void checkUpdate() async {
-    var newVer = await Utils.checkVersion();
+    var newVer = null;//await Utils.checkVersion();
     if (newVer == null) {
       return;
     }

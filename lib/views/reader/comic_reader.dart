@@ -176,12 +176,15 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   int _pendingIndex = 1;
   double _pendingOffset = 0.0;
 
-  bool _expand = false;
+  bool _expand = null;
 
   bool get comicVerticalMode => context.comicVerticalMode;
 
   @override
   Widget build(BuildContext context) {
+    if (_expand == null){
+      _expand = MediaQuery.of(context).size.width < _expandWidth;
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       floatingActionButton: MediaQuery.of(context).size.width > _expandWidth

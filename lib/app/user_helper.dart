@@ -252,7 +252,7 @@ class UserHelper {
             await ComicHistoryProvider.update(historyItem);
           } else {
             await ComicHistoryProvider.insert(ComicHistory(item.comic_id,
-                item.chapter_id, item.progress?.toDouble() ?? 1, 1));
+                item.chapter_id, item.progress?.toDouble() ?? 1, 0, 1));
           }
         }
       }

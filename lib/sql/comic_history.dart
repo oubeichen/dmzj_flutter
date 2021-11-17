@@ -5,6 +5,7 @@ final String comicHistoryTable = 'comic_history';
 final String comicHistoryColumnComicID = 'comic_id';
 final String comicHistoryColumnChapterID = 'chapter_id';
 final String comicHistoryColumnPage = 'page';
+final String comicHistoryColumnPageOffset = 'offset';
 //1为横向，2为纵向阅读百分比
 final String comicHistoryMode = 'mode';
 
@@ -12,6 +13,7 @@ class ComicHistory {
   int comic_id;
   int chapter_id;
   double page;
+  double offset;
   int mode;
   
   Map<String, dynamic> toMap() {
@@ -19,17 +21,19 @@ class ComicHistory {
       comicHistoryColumnComicID: comic_id,
       comicHistoryColumnChapterID: chapter_id,
       comicHistoryColumnPage: page,
-      comicHistoryMode:mode,
+      comicHistoryColumnPageOffset: offset,
+      comicHistoryMode:mode
     };
     return map;
   }
 
-  ComicHistory(this.comic_id,this.chapter_id,this.page,this.mode);
+  ComicHistory(this.comic_id,this.chapter_id,this.page,this.offset,this.mode);
 
   ComicHistory.fromMap(Map<String, dynamic> map) {
     comic_id = map[comicHistoryColumnComicID];
     chapter_id = map[comicHistoryColumnChapterID];
     page = map[comicHistoryColumnPage];
+    offset = map[comicHistoryColumnPageOffset];
     mode= map[comicHistoryMode];
   }
 }
@@ -47,7 +51,7 @@ class ComicHistory {
   static Future<ComicHistory> getItem(int id) async {
     
     List<Map> maps = await db.query(comicHistoryTable,
-        columns: [comicHistoryColumnComicID, comicHistoryColumnChapterID, comicHistoryColumnPage,comicHistoryMode],
+        columns: [comicHistoryColumnComicID, comicHistoryColumnChapterID, comicHistoryColumnPage,comicHistoryColumnPageOffset, comicHistoryMode],
         where: '$comicHistoryColumnComicID = ?',
         whereArgs: [id]);
     if (maps.length > 0) {

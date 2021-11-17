@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/config_helper.dart';
+import 'package:provider/provider.dart';
 
 class AppSetting with ChangeNotifier {
   AppSetting() {
@@ -132,4 +133,9 @@ class AppSetting with ChangeNotifier {
     notifyListeners();
     ConfigHelper.setNovelTheme(value);
   }
+}
+
+extension ContextExtension on BuildContext {
+
+  bool get comicVerticalMode => Provider.of<AppSetting>(this).comicVerticalMode;
 }

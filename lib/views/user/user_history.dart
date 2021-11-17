@@ -295,7 +295,7 @@ class _HistoryTabItemState extends State<HistoryTabItem>
             await ComicHistoryProvider.update(historyItem);
           } else {
             await ComicHistoryProvider.insert(ComicHistory(item.comic_id,
-                item.chapter_id, item.progress?.toDouble() ?? 1, 1));
+                item.chapter_id, item.progress?.toDouble() ?? 1, 0, 1));
           }
 
           //ConfigHelper.setComicHistory(item.comic_id, item.chapter_id);

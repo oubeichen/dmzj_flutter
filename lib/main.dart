@@ -22,6 +22,7 @@ import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'app/app_theme.dart';
+import 'app/database_config.dart';
 import 'app/user_info.dart';
 
 void main() async {
@@ -43,40 +44,6 @@ void main() async {
     ],
     child: MyApp(),
   ));
-}
-
-Future initDatabase() async {
-  var databasesPath = await databaseFactory.getDatabasesPath();
-  // File(databasesPath+"/nsplayer.db").deleteSync();
-  var db = await databaseFactory.openDatabase(databasesPath + "/comic_history.db",
-      options: OpenDatabaseOptions(
-      version: 1,
-      onCreate: (Database _db, int version) async {
-    await _db.execute('''
-create table $comicHistoryTable ( 
-  $comicHistoryColumnComicID integer primary key not null, 
-  $comicHistoryColumnChapterID integer not null,
-  $comicHistoryColumnPage double not null,
-  $comicHistoryMode integer not null)
-''');
-
-    await _db.execute('''
-create table $comicDownloadTableName (
-$comicDownloadColumnChapterID integer primary key not null,
-$comicDownloadColumnChapterName text not null,
-$comicDownloadColumnComicID integer not null,
-$comicDownloadColumnComicName text not null,
-$comicDownloadColumnStatus integer not null,
-$comicDownloadColumnVolume text not null,
-$comicDownloadColumnPage integer ,
-$comicDownloadColumnCount integer ,
-$comicDownloadColumnSavePath text ,
-$comicDownloadColumnUrls text )
-''');
-  }));
-
-  ComicHistoryProvider.db = db;
-  ComicDownloadProvider.db = db;
 }
 
 class MyApp extends StatelessWidget {

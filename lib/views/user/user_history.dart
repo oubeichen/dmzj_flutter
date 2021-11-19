@@ -4,6 +4,7 @@ import 'package:common_utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/api.dart';
 import 'package:flutter_dmzj/app/config_helper.dart';
+import 'package:flutter_dmzj/app/disk_lru_cache_mamager.dart';
 import 'package:flutter_dmzj/app/utils.dart';
 import 'package:flutter_dmzj/models/comic/comic_history_item.dart';
 import 'package:flutter_dmzj/models/novel/novel_history_item.dart';
@@ -276,16 +277,41 @@ class _HistoryTabItemState extends State<HistoryTabItem>
       if (_loading) {
         return;
       }
-      setState(() {
-        _loading = true;
-      });
+      var cacheKey = "comic_history_list";
+
+      var hasCache = false;
+      var cacheContent = await DiskLruCacheManager.read(cacheKey);
+      if (cacheContent != null) {
+        List jsonMap = jsonDecode(cacheContent);
+        List<ComicHistoryItem> detail =
+        jsonMap.map((i) => ComicHistoryItem.fromJson(i)).toList();
+        if (detail != null && detail.length != 0) {
+          hasCache = true;
+          setState(() {
+            _list = detail;
+          });
+        }
+      }
+      if (!hasCache) {
+        setState(() {
+          _loading = true;
+        });
+      }
 
       var response = await http
           .get(Uri.parse(Api.userComicHistory(ConfigHelper.getUserInfo().uid)));
-      List jsonMap = jsonDecode(response.body);
+      var jsonBody = response.body;
+      List jsonMap = jsonDecode(jsonBody);
       List<ComicHistoryItem> detail =
           jsonMap.map((i) => ComicHistoryItem.fromJson(i)).toList();
       if (detail != null && detail.length != 0) {
+        //_comicPage++;
+        setState(() {
+          _list = detail;
+        });
+
+        DiskLruCacheManager.write(cacheKey, jsonBody);
+
         for (var item in detail) {
           var historyItem = await ComicHistoryProvider.getItem(item.comic_id);
           print(item.comic_name);
@@ -300,10 +326,6 @@ class _HistoryTabItemState extends State<HistoryTabItem>
 
           //ConfigHelper.setComicHistory(item.comic_id, item.chapter_id);
         }
-        //_comicPage++;
-        setState(() {
-          _list = detail;
-        });
       }
     } catch (e) {
       print(e);

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/api.dart';
+import 'package:flutter_dmzj/app/disk_lru_cache_mamager.dart';
 import 'package:flutter_dmzj/app/user_info.dart';
 import 'package:flutter_dmzj/models/user/user_subscribe_item.dart';
 import 'package:flutter_dmzj/widgets/user_subscribe_widget.dart';
@@ -210,6 +211,19 @@ class _SubscribeTabViewState extends State<SubscribeTabView>
       if (_loading) {
         return;
       }
+      final cacheKey = "comic_subscribe_${widget.type}";
+      if (_page == 0 && _list.isEmpty) {
+        final content = await DiskLruCacheManager.read(cacheKey);
+        final list = getListFromStr(content);
+        if (list != null){
+          setState(() {
+            if (_page == 0) {
+              _list.addAll(list);
+            }
+          });
+        }
+      }
+
       setState(() {
         _loading = true;
       });
@@ -221,10 +235,9 @@ class _SubscribeTabViewState extends State<SubscribeTabView>
           letter: _letters.values.toList()[_selectLetters],
           page: _page)));
 
-      List jsonMap = jsonDecode(response.body);
+      final jsonBody = response.body;
+      List<SubscribeItem> detail = getListFromStr(jsonBody);
 
-      List<SubscribeItem> detail =
-          jsonMap.map((f) => SubscribeItem.fromJson(f)).toList();
       if (detail != null) {
         setState(() {
           if (_page == 0) {
@@ -238,6 +251,10 @@ class _SubscribeTabViewState extends State<SubscribeTabView>
         } else {
           Fluttertoast.showToast(msg: "加载完毕");
         }
+
+        if (_page == 0) {
+          DiskLruCacheManager.write(cacheKey, jsonBody);
+        }
       }
     } catch (e) {
       print(e);
@@ -246,5 +263,19 @@ class _SubscribeTabViewState extends State<SubscribeTabView>
         _loading = false;
       });
     }
+  }
+
+  List<SubscribeItem> getListFromStr(String content) {
+    try{
+      List jsonMap = jsonDecode(content);
+      return jsonMap.map((f) => SubscribeItem.fromJson(f)).toList();
+    } catch(e) {
+      print(e);
+      return null;
+    }
+  }
+
+  void _updatePageDetails(int page, List<SubscribeItem> detail) {
+
   }
 }

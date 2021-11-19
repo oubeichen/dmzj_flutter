@@ -63,7 +63,8 @@ dependencies:
   protobuf: ^2.0.0
   dio: ^4.0.0
   scrollable_positioned_list: ^0.2.2
-  
+  flutter_disk_lru_cache: ^1.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

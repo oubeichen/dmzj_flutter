@@ -6,6 +6,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_dmzj/app/api.dart';
 import 'package:flutter_dmzj/app/api/comic.dart';
 import 'package:flutter_dmzj/app/config_helper.dart';
+import 'package:flutter_dmzj/app/disk_lru_cache_mamager.dart';
 import 'package:flutter_dmzj/app/http_util.dart';
 import 'package:flutter_dmzj/app/user_helper.dart';
 import 'package:flutter_dmzj/app/user_info.dart';
@@ -124,19 +125,9 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                           Fluttertoast.showToast(msg: '没有可以下载的章节');
                           return;
                         }
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (BuildContext context) =>
-                        //             ComicDownloadPage(_detail)));
                       }
                     },
                   )
-                  // IconButton(icon: Icon(Icons.more_vert), onPressed: (){}),
-                  // IconButton(
-                  //     icon: Icon(Icons.share),
-                  //     onPressed: () => Share.share(
-                  //         "${_detail.title}\r\nhttp://m.dmzj.com/info/${_detail.comic_py}.html")),
                 ],
                 bottom: TabBar(
                     tabs: [Tab(text: "详情"), Tab(text: "评论"), Tab(text: "相关")]),
@@ -145,38 +136,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                 children: [
                   createDetail(),
                   CommentWidget(4, widget.comicId),
-                  SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Column(
-                          children: _related.author_comics
-                              .map<Widget>((f) => _getItem(
-                                      f.author_name + "的其他作品", f.data,
-                                      icon: Icon(Icons.chevron_right),
-                                      ratio: getWidth() /
-                                          ((getWidth() * (360 / 270)) + 36),
-                                      ontap: () {
-                                    Utils.openPage(context, f.author_id, 8);
-                                  }))
-                              .toList(),
-                        ),
-                        _getItem(
-                          "同类题材作品",
-                          _related.theme_comics,
-                          ratio: getWidth() / ((getWidth() * (360 / 270)) + 36),
-                        ),
-                        _related.novels != null && _related.novels.length != 0
-                            ? _getItem(
-                                "相关小说",
-                                _related.novels,
-                                type: 2,
-                                ratio: getWidth() /
-                                    ((getWidth() * (360 / 270)) + 36),
-                              )
-                            : Container()
-                      ],
-                    ),
-                  ),
+                  _createRelated(),
                 ],
               ),
             ))
@@ -438,6 +398,45 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     updateHistory();
   }
 
+  // 相关推荐
+  Widget _createRelated() {
+    if (_related == null){
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+
+    return SingleChildScrollView(
+        child: Column(
+      children: <Widget>[
+        Column(
+          children: _related.author_comics
+              .map<Widget>((f) => _getItem(f.author_name + "的其他作品", f.data,
+                      icon: Icon(Icons.chevron_right),
+                      ratio: getWidth() / ((getWidth() * (360 / 270)) + 36),
+                      ontap: () {
+                    Utils.openPage(context, f.author_id, 8);
+                  }))
+              .toList(),
+        ),
+        _getItem(
+          "同类题材作品",
+          _related.theme_comics,
+          ratio: getWidth() / ((getWidth() * (360 / 270)) + 36),
+        ),
+        _related.novels != null && _related.novels.length != 0
+            ? _getItem(
+                "相关小说",
+                _related.novels,
+                type: 2,
+                ratio: getWidth() / ((getWidth() * (360 / 270)) + 36),
+              )
+            : Container()
+      ],
+    ));
+  }
+
   Widget _getItem(String title, List items,
       {Icon icon,
       Function ontap,
@@ -562,31 +561,31 @@ class _ComicDetailPageState extends State<ComicDetailPage>
   DefaultCacheManager _cacheManager = DefaultCacheManager();
   Future loadData() async {
     try {
+      var cacheKey = "comic_detail_${widget.comicId}";
       if (_loading) {
         return;
       }
-      setState(() {
-        _loading = true;
-        _noCopyright = false;
-      });
-      // var api = Api.comicDetail(widget.comicId);
-      // Uint8List responseBody;
-      // var response = await http.get(Uri.parse(api));
-      // responseBody = response.bodyBytes;
-      // if (response.body == "漫画不存在!!!") {
-      //   var file = await _cacheManager
-      //       .getFileFromCache('http://comic.cache/${widget.comicId}');
-      //   if (file == null) {
-      //     setState(() {
-      //       _loading = false;
-      //       _noCopyright = true;
-      //     });
-      //     return;
-      //   }
-      //   responseBody = await file.file.readAsBytes();
-      // }
-      // var responseStr = utf8.decode(responseBody);
-      // var jsonMap = jsonDecode(responseStr);
+      var bytes = await DiskLruCacheManager.readBytes(cacheKey);
+      ComicDetailInfoResponse cacheDetail;
+      if (bytes != null) {
+        // 读缓存
+        var data = ComicDetailInfoResponse.fromBuffer(bytes);
+        //var data = null;
+        if (data != null) {
+          cacheDetail = data;
+        }
+      }
+      if (cacheDetail != null && cacheDetail.title != null) {
+        print("cacheDetail: $cacheDetail");
+        setState(() {
+          _detail = cacheDetail;
+        });
+      } else {
+        setState(() {
+          _loading = true;
+          _noCopyright = false;
+        });
+      }
 
       // ComicDetail detail = ComicDetail.fromJson(jsonMap);
       var detail = await ComicApi.instance.getDetail(widget.comicId);
@@ -597,14 +596,17 @@ class _ComicDetailPageState extends State<ComicDetailPage>
         });
         return;
       }
-      // await _cacheManager.putFile(
-      //     'http://comic.cache/${widget.comicId}', responseBody,
-      //     eTag: api, maxAge: Duration(days: 7), fileExtension: 'json');
-      await checkSubscribe();
-      await loadRelated();
       setState(() {
         _detail = detail;
       });
+
+      // 写缓存
+      var buffer = detail.writeToBuffer();
+      DiskLruCacheManager.writeBytes(cacheKey, buffer);
+      
+      await checkSubscribe();
+      await loadRelated();
+
     } catch (e) {
       if (e is AppError && e.code == 2) {
         setState(() {

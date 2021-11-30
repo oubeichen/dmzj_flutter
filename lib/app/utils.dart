@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -38,6 +40,8 @@ class Utils {
   static EventBus changHistory = EventBus();
   static EventBus changeHideBanner = EventBus();
   static bool isMobilePlatform = Platform.isAndroid || Platform.isIOS;
+
+  static bool isSupportScreen = false;
 
   static void showSnackbarWithAction(
       BuildContext context, String content, String action, Function onPressed) {

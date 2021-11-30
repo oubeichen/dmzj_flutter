@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/app_theme.dart';
 import 'package:flutter_dmzj/app/user_info.dart';

@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/app_setting.dart';
 import 'package:fluttertoast/fluttertoast.dart';

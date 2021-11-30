@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -178,7 +180,7 @@ class _ComicViewState extends State<ComicView> {
             key: ObjectKey(index),
             imageProvider: pageOption.imageProvider,
             loadingBuilder: widget.loadingBuilder,
-            loadFailedChild: widget.loadFailedChild,
+            errorBuilder: (context, e, d) => widget.loadFailedChild,
             backgroundDecoration: widget.backgroundDecoration,
             controller: pageOption.controller,
             scaleStateController: pageOption.scaleStateController,

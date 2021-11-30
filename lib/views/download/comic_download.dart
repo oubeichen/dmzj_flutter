@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/models/comic/comic_detail_model.dart';
 import 'package:fluttertoast/fluttertoast.dart';

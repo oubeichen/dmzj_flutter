@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter_dmzj/sql/comic_down.dart';
 // 章节ID

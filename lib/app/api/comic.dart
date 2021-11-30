@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter_dmzj/app/http_util.dart';
 import 'package:flutter_dmzj/protobuf/comic/detail_response.pb.dart';
 import 'package:flutter_dmzj/protobuf/comic/rank_list_response.pb.dart';

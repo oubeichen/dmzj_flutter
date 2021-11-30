@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter_dmzj/app/http_util.dart';
 import 'package:flutter_dmzj/protobuf/news/news_list_response.pb.dart';
 

@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/utils.dart';
 import 'package:flutter_dmzj/views/novel/novel_category.dart';

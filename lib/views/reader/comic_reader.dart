@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -12,6 +14,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_dmzj/app/api.dart';
 import 'package:flutter_dmzj/app/app_setting.dart';
 import 'package:flutter_dmzj/app/config_helper.dart';
+import 'package:flutter_dmzj/app/screen.dart';
 import 'package:flutter_dmzj/app/user_helper.dart';
 import 'package:flutter_dmzj/app/user_info.dart';
 import 'package:flutter_dmzj/app/utils.dart';
@@ -33,7 +36,6 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:provider/provider.dart';
-import 'package:screen/screen.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:share/share.dart';
 
@@ -67,7 +69,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
     if (ConfigHelper.getComicShowStatusBar()) {
       SystemChrome.setEnabledSystemUIOverlays([]);
     }
-    if (Utils.isMobilePlatform) {
+    if (Utils.isSupportScreen) {
       //亮度信息
       if (!ConfigHelper.getComicSystemBrightness()) {
         Screen.setBrightness(ConfigHelper.getComicBrightness());
@@ -140,7 +142,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   @override
   void dispose() {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    if (Utils.isMobilePlatform) {
+    if (Utils.isSupportScreen) {
       Screen.keepOn(false);
     }
     int page = 1;

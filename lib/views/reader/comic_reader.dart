@@ -27,6 +27,8 @@ import 'package:flutter_dmzj/views/other/platform_methods.dart';
 import 'package:flutter_dmzj/views/reader/comic_tc.dart';
 import 'package:flutter_dmzj/widgets/GestureZoomBox.dart';
 import 'package:flutter_dmzj/widgets/comic_view.dart';
+import 'package:flutter_dmzj/widgets/positioned_list/item_positions_listener.dart';
+import 'package:flutter_dmzj/widgets/positioned_list/scrollable_positioned_list.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
@@ -36,7 +38,6 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:provider/provider.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:share/share.dart';
 
 class ComicReaderPage extends StatefulWidget {
@@ -695,6 +696,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
           initialScrollIndex: _pendingIndex,
           initialAlignment: _pendingOffset,
           scrollDirection: Axis.vertical,
+          resolveGestureConflict: true,
           separatorBuilder: (ctx, i) => Container(
                 height: 10,
               ),

@@ -1,4 +1,3 @@
-// @dart=2.9
 
 import 'dart:convert';
 
@@ -13,7 +12,7 @@ class UserHelper {
   static Future<bool> comicSubscribe(int comicId, {bool cancel = false}) async {
     try {
       //TODO 跳转登录
-      if (!ConfigHelper.getUserIsLogined() ?? false) {
+      if (!ConfigHelper.getUserIsLogined()) {
         Fluttertoast.showToast(msg: '没有登录');
         return false;
       }
@@ -46,7 +45,7 @@ class UserHelper {
   static Future<bool> novelSubscribe(int novelId, {bool cancel = false}) async {
     try {
       //TODO 跳转登录
-      if (!ConfigHelper.getUserIsLogined() ?? false) {
+      if (!ConfigHelper.getUserIsLogined()) {
         Fluttertoast.showToast(msg: '没有登录');
         return false;
       }
@@ -81,7 +80,7 @@ class UserHelper {
       {int page = 0}) async {
     try {
       //TODO 跳转登录
-      if (!ConfigHelper.getUserIsLogined() ?? false) {
+      if (!ConfigHelper.getUserIsLogined()) {
         Fluttertoast.showToast(msg: '没有登录');
         return false;
       }
@@ -139,7 +138,7 @@ class UserHelper {
       {int page = 1}) async {
     try {
       //TODO 跳转登录
-      if (!ConfigHelper.getUserIsLogined() ?? false) {
+      if (!ConfigHelper.getUserIsLogined()) {
         return false;
       }
       var uid = ConfigHelper.getUserInfo()?.uid ?? "";
@@ -162,7 +161,7 @@ class UserHelper {
       {int page = 1}) async {
     try {
       //TODO 跳转登录
-      if (!ConfigHelper.getUserIsLogined() ?? false) {
+      if (!ConfigHelper.getUserIsLogined()) {
         return false;
       }
       var uid = ConfigHelper.getUserInfo()?.uid ?? "";
@@ -184,7 +183,7 @@ class UserHelper {
   static Future<bool> newsCheckSub(int newsId) async {
     try {
       //TODO 跳转登录
-      if (!ConfigHelper.getUserIsLogined() ?? false) {
+      if (!ConfigHelper.getUserIsLogined()) {
         return false;
       }
       var uid = ConfigHelper.getUserInfo()?.uid ?? "";
@@ -209,7 +208,7 @@ class UserHelper {
   static Future<bool> addOrCancelNewsSub(int newsId, bool cancel) async {
     try {
       //TODO 跳转登录
-      if (!ConfigHelper.getUserIsLogined() ?? false) {
+      if (!ConfigHelper.getUserIsLogined()) {
         Fluttertoast.showToast(msg: '没有登录');
         return false;
       }
@@ -237,14 +236,14 @@ class UserHelper {
 
   static Future<bool> loadComicHistory() async {
     try {
-      if (!ConfigHelper.getUserIsLogined() ?? false) {
+      if (!ConfigHelper.getUserIsLogined()) {
         return false;
       }
       var response = await http
-          .get(Uri.parse(Api.userComicHistory(ConfigHelper.getUserInfo().uid)));
-      List jsonMap = jsonDecode(response.body);
-      List<ComicHistoryItem> detail =
-          jsonMap.map((i) => ComicHistoryItem.fromJson(i)).toList();
+          .get(Uri.parse(Api.userComicHistory(ConfigHelper.getUserInfo()?.uid ?? "")));
+      List? jsonMap = jsonDecode(response.body);
+      List<ComicHistoryItem>? detail =
+          jsonMap?.map((i) => ComicHistoryItem.fromJson(i)).toList();
       if (detail != null) {
         for (var item in detail) {
           var historyItem = await ComicHistoryProvider.getItem(item.comic_id);

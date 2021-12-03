@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter_dmzj/app/http_util.dart';
 import 'package:flutter_dmzj/protobuf/comic/detail_response.pb.dart';
 import 'package:flutter_dmzj/protobuf/comic/rank_list_response.pb.dart';
@@ -8,12 +6,12 @@ import 'package:flutter_dmzj/protobuf/comic/update_list_response.pb.dart';
 import 'api_util.dart';
 
 class ComicApi {
-  static ComicApi _comicApi;
+  static ComicApi? _comicApi;
   static ComicApi get instance {
     if (_comicApi == null) {
       _comicApi = ComicApi();
     }
-    return _comicApi;
+    return _comicApi!;
   }
 
   /// 首页-更新
@@ -51,7 +49,7 @@ class ComicApi {
 
   /// 首页-排行榜
   Future<List<ComicRankListItemResponse>> getRankList(
-      {int tagId = 0, int byTime = 0, int rankType, int page = 0}) async {
+      {int tagId = 0, int byTime = 0, required int rankType, int page = 0}) async {
     var path = "${ApiUtil.BASE_URL_V4}/comic/rank/list";
     var par = ApiUtil.defaultParameter(needLogined: true);
     par.addAll({

@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter_dmzj/sql/comic_down.dart';
 import 'package:flutter_dmzj/sql/comic_history.dart';
 import 'package:tekartik_app_flutter_sqflite/sqflite.dart';

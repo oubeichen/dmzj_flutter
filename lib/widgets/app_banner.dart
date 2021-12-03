@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +5,7 @@ import 'package:flutter/material.dart';
 class AppBanner extends StatefulWidget {
   final List<Widget> items;
 
-  AppBanner({Key key, this.items}) : super(key: key);
+  AppBanner({Key? key, required this.items}) : super(key: key);
 
   _AppBannerState createState() => _AppBannerState();
 }
@@ -71,9 +69,9 @@ class _AppBannerState extends State<AppBanner> {
 
 class BannerImageItem extends StatelessWidget {
   final String pic;
-  final Function onTaped;
+  final GestureTapCallback onTaped;
   final String title;
-  BannerImageItem({Key key, this.pic, this.onTaped, this.title = ""})
+  BannerImageItem({Key? key, required this.pic, required this.onTaped, this.title = ""})
       : super(key: key);
 
   @override

@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/config_helper.dart';
 
@@ -25,8 +23,8 @@ class AppTheme with ChangeNotifier {
     "朴素灰": Colors.blueGrey
   };
 
-  ThemeMode _themeMode;
-  String _themeModeName;
+  late ThemeMode _themeMode;
+  late String _themeModeName;
   get themeMode => _themeMode;
   get themeModeName => _themeModeName;
   void changeThemeMode(int index) {
@@ -66,8 +64,8 @@ class AppTheme with ChangeNotifier {
     return widgets;
   }
 
-  Color _themeColor;
-  String _themeColorName;
+  late Color _themeColor;
+  late String _themeColorName;
   get themeColor => _themeColor;
   get themeColorName => _themeColorName;
   void changeThemeColor(int index) {

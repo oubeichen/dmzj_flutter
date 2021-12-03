@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:convert';
 
 import 'package:flutter_dmzj/models/user/user_model.dart';
@@ -7,7 +5,7 @@ import 'package:flutter_dmzj/models/user/user_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ConfigHelper {
-  static SharedPreferences prefs;
+  static late SharedPreferences prefs;
 
   /// APP夜间模式
   static int getThemeMode() {
@@ -46,26 +44,26 @@ class ConfigHelper {
   }
 
   /// 读取用户信息
-  static UserInfo getUserInfo() {
+  static UserInfo? getUserInfo() {
     var userInfoString = prefs.getString("userInfo");
     return (userInfoString != null && userInfoString.length != 0)
         ? UserInfo.fromJson(jsonDecode(userInfoString))
         : null;
   }
 
-  static void setUserInfo(UserInfo value) {
+  static void setUserInfo(UserInfo? value) {
     prefs.setString("userInfo", jsonEncode(value));
   }
 
   /// 读取用户资料
-  static UserProfileModel getUserProfile() {
+  static UserProfileModel? getUserProfile() {
     var userInfoString = prefs.getString("userProfile");
     return (userInfoString != null && userInfoString.length != 0)
         ? UserProfileModel.fromJson(jsonDecode(userInfoString))
         : null;
   }
 
-  static void setUserProfile(UserProfileModel value) {
+  static void setUserProfile(UserProfileModel? value) {
     prefs.setString("userProfile", jsonEncode(value));
   }
 

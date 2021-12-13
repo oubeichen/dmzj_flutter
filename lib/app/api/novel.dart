@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -7,12 +9,12 @@ import 'package:flutter_dmzj/protobuf/novel/novel_detail_response.pb.dart';
 import 'api_util.dart';
 
 class NovelApi {
-  static NovelApi? _novelApi;
+  static NovelApi _novelApi;
   static NovelApi get instance {
     if (_novelApi == null) {
       _novelApi = NovelApi();
     }
-    return _novelApi!;
+    return _novelApi;
   }
 
   /// 轻小说详情

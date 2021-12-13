@@ -1,3 +1,4 @@
+// @dart=2.9
 
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter_dmzj/sql/comic_down.dart';
@@ -34,8 +35,8 @@ import 'package:flutter_dmzj/sql/comic_down.dart';
 class ComicDownloadHelper{
   static EventBus downloadEvent=EventBus();
   static List<ComicDownloadSqlItem> dwonloadQueues=[];
-  static ComicDownloadSqlItem? currentDownload;
-  static bool downloading = false;
+  static ComicDownloadSqlItem currentDownload;
+  static bool downloading;
   static void addDownload(ComicDownloadSqlItem info) async{
     //保存数据库
     var item=await ComicDownloadProvider.getItem(info.chapterID);

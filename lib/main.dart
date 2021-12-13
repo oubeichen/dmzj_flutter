@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -84,8 +86,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
-  static NewsHomePage? newsPage;
-  static NovelHomePage? novelPage;
+  static NewsHomePage newsPage;
+  static NovelHomePage novelPage;
   List<Widget> pages = [
     ComicHomePage(),
     Container(),
@@ -125,11 +127,11 @@ class _MyHomePageState extends State<MyHomePage>
           setState(() {
             if (index == 1 && newsPage == null) {
               newsPage = NewsHomePage();
-              pages[1] = newsPage!;
+              pages[1] = newsPage;
             }
             if (index == 2 && novelPage == null) {
               novelPage = NovelHomePage();
-              pages[2] = novelPage!;
+              pages[2] = novelPage;
             }
             _index = index;
           });
@@ -155,7 +157,34 @@ class _MyHomePageState extends State<MyHomePage>
       ),
       body: Row(
         children: <Widget>[
-
+          // NavigationRail(
+          //   backgroundColor: Theme.of(context).bottomAppBarColor,
+          //     onDestinationSelected: (int index) {
+          //       setState(() {
+          //         _index = index;
+          //       });
+          //     },
+          //     labelType: NavigationRailLabelType.all,
+          //     destinations: [
+          //       NavigationRailDestination(
+          //         icon: Icon(Icons.library_books),
+          //         label: Text('漫画'),
+          //       ),
+          //       NavigationRailDestination(
+          //         icon: Icon(Icons.whatshot),
+          //         label: Text('新闻'),
+          //       ),
+          //       NavigationRailDestination(
+          //         icon: Icon(Icons.book),
+          //         label: Text('轻小说'),
+          //       ),
+          //       NavigationRailDestination(
+          //         icon: Icon(Icons.account_circle),
+          //         label: Text('我的'),
+          //       ),
+          //     ],
+          //     selectedIndex: _index),
+          // VerticalDivider(thickness: 1, width: 1),
           Expanded(
               child: IndexedStack(
             index: _index,

@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -7,11 +9,11 @@ import 'package:flutter_disk_lru_cache/flutter_disk_lru_cache.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DiskLruCacheManager {
-  static DiskLruCache? _sDiskLruCache;
+  static DiskLruCache _sDiskLruCache;
 
-  static Future<DiskLruCache?> _getLruCache() async {
+  static Future<DiskLruCache> _getLruCache() async {
     if (_sDiskLruCache != null) {
-      return _sDiskLruCache!;
+      return _sDiskLruCache;
     }
     WidgetsFlutterBinding.ensureInitialized();
     Directory tempDirectory = await getTemporaryDirectory();
@@ -26,7 +28,7 @@ class DiskLruCacheManager {
     return diskLruCache;
   }
 
-  static Future<String?> read(String key) async {
+  static Future<String> read(String key) async {
     var bytes = await readBytes(key);
     if (bytes == null) {
       return null;
@@ -35,13 +37,13 @@ class DiskLruCacheManager {
     return text;
   }
 
-  static Future<Uint8List?> readBytes(String key) async {
+  static Future<Uint8List> readBytes(String key) async {
     var diskLruCache = await _getLruCache();
     if (diskLruCache == null) {
       return null;
     }
 
-    Snapshot? snapShot;
+    Snapshot snapShot;
     try {
       snapShot = await diskLruCache.get(key);
       if (snapShot == null) {
@@ -69,7 +71,7 @@ class DiskLruCacheManager {
     if (diskLruCache == null) {
       return false;
     }
-    Editor? editor;
+    Editor editor;
     try {
       // write data to disk cache
       editor = await diskLruCache.edit(key);
@@ -86,13 +88,11 @@ class DiskLruCacheManager {
       await faultHidingIOSink.close();
       // comfirm commit
       await editor.commit(diskLruCache);
-      return true;
     } catch (e) {
       print(e);
       if (editor != null) {
         editor.abort(diskLruCache);
       }
-      return false;
     }
   }
 
@@ -101,7 +101,7 @@ class DiskLruCacheManager {
     if (diskLruCache == null) {
       return false;
     }
-    Editor? editor;
+    Editor editor;
     try {
       // write data to disk cache
       editor = await diskLruCache.edit(key);
@@ -118,13 +118,11 @@ class DiskLruCacheManager {
       await faultHidingIOSink.close();
       // comfirm commit
       await editor.commit(diskLruCache);
-      return true;
     } catch (e) {
       print(e);
       if (editor != null) {
         editor.abort(diskLruCache);
       }
-      return false;
     }
   }
 }

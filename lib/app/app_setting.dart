@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dmzj/app/config_helper.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +20,7 @@ class AppSetting with ChangeNotifier {
     changeNovelReadTheme(ConfigHelper.getNovelTheme());
   }
 
-  late bool _comicVerticalMode;
+  bool _comicVerticalMode;
   get comicVerticalMode => _comicVerticalMode;
   void changeComicVertical(bool value) {
     _comicVerticalMode = value;
@@ -30,7 +32,7 @@ class AppSetting with ChangeNotifier {
     }
   }
 
-  late bool _comicWebApi;
+  bool _comicWebApi;
   get comicWebApi => _comicWebApi;
   void changeComicWebApi(bool value) {
     _comicWebApi = value;
@@ -38,7 +40,7 @@ class AppSetting with ChangeNotifier {
     ConfigHelper.setComicWebApi(value);
   }
 
-  late bool _comicWakelock;
+  bool _comicWakelock;
   get comicWakelock => _comicWakelock;
   void changeComicWakelock(bool value) {
     _comicWakelock = value;
@@ -46,7 +48,7 @@ class AppSetting with ChangeNotifier {
     ConfigHelper.setComicWakelock(value);
   }
 
-  late bool _comicReadReverse;
+  bool _comicReadReverse;
   get comicReadReverse => _comicReadReverse;
   void changeReadReverse(bool value) {
     _comicReadReverse = value;
@@ -57,7 +59,7 @@ class AppSetting with ChangeNotifier {
     }
   }
 
-  late bool _comicReadShowstate;
+  bool _comicReadShowstate;
   get comicReadShowstate => _comicReadShowstate;
   void changeComicReadShowState(bool value) {
     _comicReadShowstate = value;
@@ -65,7 +67,7 @@ class AppSetting with ChangeNotifier {
     ConfigHelper.setComicReadShowState(value);
   }
 
-  late bool _comicReadShowStatusBar;
+  bool _comicReadShowStatusBar;
   get comicReadShowStatusBar => _comicReadShowStatusBar;
   void changeComicReadShowStatusBar(bool value) {
     _comicReadShowStatusBar = value;
@@ -73,7 +75,7 @@ class AppSetting with ChangeNotifier {
     ConfigHelper.setComicShowStatusBar(value);
   }
 
-  late bool _comicSystemBrightness;
+  bool _comicSystemBrightness;
   get comicSystemBrightness => _comicSystemBrightness;
   void changeComicSystemBrightness(bool value) {
     _comicSystemBrightness = value;
@@ -81,7 +83,7 @@ class AppSetting with ChangeNotifier {
     ConfigHelper.setComicSystemBrightness(value);
   }
 
-  late double _comicBrightness;
+  double _comicBrightness;
   get comicBrightness => _comicBrightness;
   void changeBrightness(double value) {
     _comicBrightness = value;
@@ -89,7 +91,7 @@ class AppSetting with ChangeNotifier {
     ConfigHelper.setComicBrightness(value);
   }
 
-  late double _novelFontSize;
+  double _novelFontSize;
   double get novelFontSize => _novelFontSize;
   void changeNovelFontSize(double value) {
     _novelFontSize = value;
@@ -97,7 +99,7 @@ class AppSetting with ChangeNotifier {
     ConfigHelper.setNovelFontSize(value);
   }
 
-  late double _novelLineHeight;
+  double _novelLineHeight;
   double get novelLineHeight => _novelLineHeight;
   void changeNovelLineHeight(double value) {
     _novelLineHeight = value;
@@ -105,7 +107,7 @@ class AppSetting with ChangeNotifier {
     ConfigHelper.setNovelLineHeight(value);
   }
 
-  late int _novelReadDirection;
+  int _novelReadDirection;
   get novelReadDirection => _novelReadDirection;
   void changeNovelReadDirection(int value) {
     _novelReadDirection = value;
@@ -126,7 +128,7 @@ class AppSetting with ChangeNotifier {
     Color.fromRGBO(200, 200, 200, 1),
   ];
 
-  late int _novelReadTheme;
+  int _novelReadTheme;
   get novelReadTheme => _novelReadTheme;
   void changeNovelReadTheme(int value) {
     _novelReadTheme = value;

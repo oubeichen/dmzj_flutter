@@ -1,23 +1,25 @@
+// @dart=2.9
+
 import 'package:dio/dio.dart';
 
 class HttpUtil {
-  static HttpUtil? _httpUtil;
+  static HttpUtil _httpUtil;
   static HttpUtil get instance {
     if (_httpUtil == null) {
       _httpUtil = HttpUtil();
     }
-    return _httpUtil!;
+    return _httpUtil;
   }
 
-  late Dio dio;
+  Dio dio;
   HttpUtil() {
     dio = Dio(
       BaseOptions(),
     );
   }
-  Future<String?> httpGet(
+  Future<String> httpGet(
     String url, {
-    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic> queryParameters,
     bool needLogin = false,
   }) async {
     try {
@@ -47,7 +49,7 @@ class HttpUtil {
         throw AppError("请求被取消");
         break;
       case DioErrorType.response:
-        throw AppError("请求失败:${e.response?.statusCode}");
+        throw AppError("请求失败:${e.response.statusCode}");
         break;
       case DioErrorType.connectTimeout:
       case DioErrorType.sendTimeout:
@@ -63,10 +65,10 @@ class HttpUtil {
 
 class AppError implements Exception {
   final int code;
-  final String? message;
+  final String message;
   AppError(
     this.message, {
-    this.code = -1,
+    this.code,
   });
 
   @override

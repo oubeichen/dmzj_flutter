@@ -73,81 +73,7 @@ class _CommentWidgetState extends State<CommentWidget>
     }
     return Scaffold(
       body: EasyRefresh(
-        child: SingleChildScrollView(
-          controller: _controller,
-          child: Column(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        text + "评论" + "($_commentCount)",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ),
-                    PopupMenuButton<bool>(
-                      child: Container(
-                          height: 36,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(_isHot ? "热门评论" : "最新评论"),
-                              Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.grey,
-                              )
-                            ],
-                          )),
-                      onSelected: (v) async {
-                        setState(() {
-                          _isHot = v;
-                        });
-                        _page = 1;
-                        await loadData();
-                      },
-                      itemBuilder: (c) => [
-                        CheckedPopupMenuItem<bool>(
-                          child: Text("最新评论"),
-                          value: false,
-                          checked: !_isHot,
-                        ),
-                        CheckedPopupMenuItem<bool>(
-                          child: Text("最热评论"),
-                          value: true,
-                          checked: _isHot,
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ),
-              _page == 1 && _loading
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Container(),
-              _list.length != 0
-                  ? ListView(
-                      shrinkWrap: true,
-                      controller: _controller,
-                      children:
-                          _list.map<Widget>((f) => createItem(f)).toList(),
-                    )
-                  : Center(
-                      child: Container(
-                        padding: EdgeInsets.all(24),
-                        child: Text(
-                          "什么都没有呢~",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    )
-            ],
-          ),
-        ),
+        child: createContent(text),
         onLoad: loadData,
         onRefresh: () async {
           _page = 1;
@@ -159,6 +85,85 @@ class _CommentWidgetState extends State<CommentWidget>
       floatingActionButton: FloatingActionButton(
         onPressed: () => {},
         child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget createContent(String text) {
+    if (_page == 1 && _loading) {
+      return Container(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    if (_list.length == 0) {
+      return Center(
+        child: Container(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            "什么都没有呢~",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      );
+    }
+    return ListView.builder(
+        controller: _controller,
+        itemCount: _list.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return createTopFilter(text);
+          }
+          return createItem(_list[index - 1]);
+        });
+  }
+
+  Widget createTopFilter(String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              text + "评论" + "($_commentCount)",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ),
+          PopupMenuButton<bool>(
+            child: Container(
+                height: 36,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(_isHot ? "热门评论" : "最新评论"),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.grey,
+                    )
+                  ],
+                )),
+            onSelected: (v) async {
+              setState(() {
+                _isHot = v;
+              });
+              _page = 1;
+              await loadData();
+            },
+            itemBuilder: (c) => [
+              CheckedPopupMenuItem<bool>(
+                child: Text("最新评论"),
+                value: false,
+                checked: !_isHot,
+              ),
+              CheckedPopupMenuItem<bool>(
+                child: Text("最热评论"),
+                value: true,
+                checked: _isHot,
+              )
+            ],
+          )
+        ],
       ),
     );
   }
@@ -478,6 +483,7 @@ class _CommentWidgetState extends State<CommentWidget>
   }
 
   bool _loading = false;
+
   Future loadData() async {
     try {
       if (_loading) {

@@ -463,21 +463,24 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                   SizedBox(
                     height: 4.0,
                   ),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    itemCount: items.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: count,
-                        crossAxisSpacing: 4.0,
-                        mainAxisSpacing: 4.0,
-                        childAspectRatio: ratio),
-                    itemBuilder: (context, i) => _getComicItemBuilder(
-                        items[i].id, type, items[i].cover, items[i].name,
-                        author: needSubTitle ? items[i].status : "",
-                        url: '',
-                        width: imgWidth,
-                        height: imgHeight),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: 600),
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
+                      itemCount: items.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: count,
+                          crossAxisSpacing: 4.0,
+                          mainAxisSpacing: 4.0,
+                          childAspectRatio: ratio),
+                      itemBuilder: (context, i) => _getComicItemBuilder(
+                          items[i].id, type, items[i].cover, items[i].name,
+                          author: needSubTitle ? items[i].status : "",
+                          url: '',
+                          width: imgWidth,
+                          height: imgHeight),
+                    ),
                   ),
                 ],
               ),

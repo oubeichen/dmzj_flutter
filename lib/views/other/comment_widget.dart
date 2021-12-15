@@ -71,6 +71,24 @@ class _CommentWidgetState extends State<CommentWidget>
     } else if (widget.type == 4) {
       text = "小说";
     }
+    if (_page == 1 && _loading) {
+      return Container(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    if (_list.length == 0) {
+      return Center(
+        child: Container(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            "什么都没有呢~",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       body: EasyRefresh(
         child: createContent(text),
@@ -90,24 +108,6 @@ class _CommentWidgetState extends State<CommentWidget>
   }
 
   Widget createContent(String text) {
-    if (_page == 1 && _loading) {
-      return Container(
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-    if (_list.length == 0) {
-      return Center(
-        child: Container(
-          padding: EdgeInsets.all(24),
-          child: Text(
-            "什么都没有呢~",
-            style: TextStyle(color: Colors.grey),
-          ),
-        ),
-      );
-    }
     return ListView.builder(
         controller: _controller,
         itemCount: _list.length + 1,
@@ -168,53 +168,55 @@ class _CommentWidgetState extends State<CommentWidget>
     );
   }
 
+  Widget createCommentPoup(CommentItem item) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        ListTile(
+          title: Text(item.nickname),
+          leading: Icon(Icons.account_circle),
+          onTap: () {
+            Utils.openPage(context, item.sender_uid, 12);
+          },
+        ),
+        ListTile(
+          title: Text("点赞"),
+          leading: Icon(Icons.thumb_up),
+          onTap: () {
+            setState(() {
+              item.like_amount++;
+            });
+            Navigator.of(context).pop();
+          },
+        ),
+        ListTile(
+          title: Text("回复"),
+          leading: Icon(Icons.reply),
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ListTile(
+          title: Text("复制"),
+          leading: Icon(Icons.content_copy),
+          onTap: () {
+            Clipboard.setData(ClipboardData(text: item.content));
+            Fluttertoast.showToast(msg: '已将内容复制到剪贴板');
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  }
+
+  // 评论item
   Widget createItem(CommentItem item) {
     var text = _htmlUnescape.convert(item.content);
     return InkWell(
       onTap: () {
         showModalBottomSheet(
-            context: context,
-            builder: (ctx) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  ListTile(
-                    title: Text(item.nickname),
-                    leading: Icon(Icons.account_circle),
-                    onTap: () {
-                      Utils.openPage(context, item.sender_uid, 12);
-                    },
-                  ),
-                  ListTile(
-                    title: Text("点赞"),
-                    leading: Icon(Icons.thumb_up),
-                    onTap: () {
-                      setState(() {
-                        item.like_amount++;
-                      });
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  ListTile(
-                    title: Text("回复"),
-                    leading: Icon(Icons.reply),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  ListTile(
-                    title: Text("复制"),
-                    leading: Icon(Icons.content_copy),
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: item.content));
-                      Fluttertoast.showToast(msg: '已将内容复制到剪贴板');
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            });
+            context: context, builder: (ctx) => createCommentPoup(item));
       },
       child: Container(
         padding: EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
@@ -228,6 +230,7 @@ class _CommentWidgetState extends State<CommentWidget>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             InkWell(
+              // 头像
               onTap: () {
                 Utils.openPage(context, item.sender_uid, 12);
               },
@@ -244,104 +247,91 @@ class _CommentWidgetState extends State<CommentWidget>
             SizedBox(width: 12),
             Expanded(
                 child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        item.nickname,
-                        maxLines: 1,
-                        style: TextStyle(color: Theme.of(context).accentColor),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
                     Text(
-                      "",
-                      style: TextStyle(color: Colors.grey),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                item.masterCommentNum != 0
+                      item.nickname,
+                      maxLines: 1,
+                      style: TextStyle(color: Theme.of(context).accentColor),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 8),
+                    item.masterCommentNum != 0
                     ? item.expand
                         ? createMasterCommentAll(item.masterComment)
                         : createMasterComment(item)
                     : Container(),
-                Text(
-                  text,
-                ),
-                item.upload_images != null && item.upload_images.length != 0
-                    ? Padding(
-                        padding: EdgeInsets.only(top: 8),
-                        child: Wrap(
-                          children:
-                              item.upload_images.split(",").map<Widget>((f) {
-                            var str = f.split(".").toList();
-                            var fileImg = str[0];
-                            var fileImgSuffix = str[1];
-                            return InkWell(
-                                onTap: () => Utils.showImageViewDialog(context,
-                                    "https://images.dmzj.com/commentImg/${item.obj_id % 500}/$f"),
-                                child: Container(
-                                  padding: EdgeInsets.only(right: 8),
-                                  width: 100,
-                                  child: Utils.createCacheImage(
-                                      "https://images.dmzj.com/commentImg/${item.obj_id % 500}/${fileImg}_small.$fileImgSuffix",
-                                      100,
-                                      100),
-                                ));
-                          }).toList(),
-                        ),
-                      )
-                    : Container(),
-                SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        TimelineUtil.format(
-                          item.create_time * 1000,
-                          locale: 'zh',
-                        ),
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ),
-                    InkWell(
-                      child: Text(
-                        "点赞" +
-                            (item.like_amount == 0
-                                ? ""
-                                : "(${item.like_amount})"),
-                        style: TextStyle(
-                            color: Theme.of(context).accentColor, fontSize: 12),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 16,
-                    ),
-                    InkWell(
-                      child: Text(
-                        "回复" +
-                            (item.reply_amount == 0
-                                ? ""
-                                : "(${item.reply_amount})"),
-                        style: TextStyle(
-                            color: Theme.of(context).accentColor, fontSize: 12),
-                      ),
-                    )
+                    Text(text),
+                    createCommentPoup(item),
+                    SizedBox(height: 8),
+                    createTimeAndLike(item)
                   ],
-                )
-              ],
-            ))
+                ))
           ],
         ),
       ),
+    );
+  }
+
+  // 图片列表
+  Widget createUploadImages(CommentItem item) {
+    var uploadImage = item.upload_images;
+    if (uploadImage == null || uploadImage.isEmpty) {
+      return Container();
+    }
+    return Padding(padding: EdgeInsets.only(top: 8),
+      child: Wrap(
+        children:
+        item.upload_images.split(",").map<Widget>((f) {
+          var str = f.split(".").toList();
+          var fileImg = str[0];
+          var fileImgSuffix = str[1];
+          return InkWell(
+              onTap: () => Utils.showImageViewDialog(context,
+                  "https://images.dmzj.com/commentImg/${item.obj_id % 500}/$f"),
+              child: Container(
+                padding: EdgeInsets.only(right: 8),
+                width: 100,
+                child: Utils.createCacheImage(
+                    "https://images.dmzj.com/commentImg/${item.obj_id % 500}/${fileImg}_small.$fileImgSuffix",
+                    100,
+                    100),
+              ));
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget createTimeAndLike(CommentItem item) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            TimelineUtil.format(item.create_time * 1000, locale: 'zh',),
+            style: TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+        ),
+        InkWell(
+          child: Text(
+            "点赞" +
+                (item.like_amount == 0
+                    ? ""
+                    : "(${item.like_amount})"),
+            style: TextStyle(
+                color: Theme.of(context).accentColor, fontSize: 12),
+          ),
+        ),
+        SizedBox(width: 16),
+        InkWell(
+          child: Text("回复" +
+              (item.reply_amount == 0 ? ""
+                  : "(${item.reply_amount})"),
+            style: TextStyle(
+                color: Theme.of(context).accentColor, fontSize: 12),
+          ),
+        )
+      ],
     );
   }
 

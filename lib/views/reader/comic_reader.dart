@@ -185,6 +185,8 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
 
   bool get comicVerticalMode => context.comicVerticalMode;
 
+  var maxConstraints = BoxConstraints(maxWidth: 800);
+
   @override
   Widget build(BuildContext context) {
     if (_expand == null) {
@@ -204,7 +206,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
           : null,
       body: Center(
         child: Container(
-          width: _expand ? null : _expandWidth,
+          constraints: _expand ? null : maxConstraints,
           child: Stack(
             children: <Widget>[
               !_loading
@@ -254,7 +256,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
         ? Positioned(child: Container())
         : Positioned(
             left: 0,
-            width: 40,
+            width: 60,
             height: MediaQuery.of(context).size.height,
             child: InkWell(
               onTap: () {
@@ -275,7 +277,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
         ? Positioned(child: Container())
         : Positioned(
             right: 0,
-            width: 40,
+            width: 60,
             height: MediaQuery.of(context).size.height,
             child: InkWell(
               onTap: () {
@@ -296,8 +298,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
     return AnimatedPositioned(
       duration: Duration(milliseconds: 200),
       width: _expand ? MediaQuery.of(context).size.width : _expandWidth,
-      child: Container(
-        padding: EdgeInsets.only(
+      child: Container(padding: EdgeInsets.only(
             top: Provider.of<AppSetting>(context).comicReadShowStatusBar
                 ? 0
                 : MediaQuery.of(context).padding.top),
@@ -526,7 +527,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
         } else {
           newPage = _selectIndex - 1;
         }
-        _pageController.jumpToPage(newPage);
+        _pageController.animateToPage(newPage, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
       });
     }
   }
@@ -536,7 +537,8 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
       nextChapter();
     } else {
       setState(() {
-        _pageController.jumpToPage(_selectIndex + 1);
+        _pageController.animateToPage(_selectIndex + 1,
+            duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
       });
     }
   }
@@ -946,7 +948,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   ComicWebChapterDetail _detail;
   DefaultCacheManager _cacheManager = DefaultCacheManager();
 
-  Future loadData() async {
+  Future loadData({bool isPrevious = false}) async {
     try {
       if (_loading) {
         return;
@@ -990,9 +992,10 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
         });
         // _pageController.=;
       } else {
-        _pageController = new PreloadPageController(initialPage: 1);
+        var initialPage = isPrevious ? detail.page_url.length: 1;
+        _pageController = new PreloadPageController(initialPage: initialPage);
         setState(() {
-          _selectIndex = 1;
+          _selectIndex = initialPage;
           _pendingIndex = 0;
           _pendingOffset = 0;
         });
@@ -1057,7 +1060,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
     setState(() {
       _currentItem = widget.chapters[widget.chapters.indexOf(_currentItem) - 1];
     });
-    await loadData();
+    await loadData(isPrevious: true);
   }
 
   void initConnectivity() {

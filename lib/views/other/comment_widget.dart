@@ -262,7 +262,6 @@ class _CommentWidgetState extends State<CommentWidget>
                         : createMasterComment(item)
                     : Container(),
                     Text(text),
-                    createCommentPoup(item),
                     SizedBox(height: 8),
                     createTimeAndLike(item)
                   ],

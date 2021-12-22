@@ -209,10 +209,19 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
           constraints: _expand ? null : maxConstraints,
           child: Stack(
             children: <Widget>[
-              !_loading
-                  ? comicVerticalMode
+              !_loading ? _isError ? Container(
+                child: Center(
+                  child: InkWell(
+                    onTap: (){
+                      loadData();
+                    },
+                    child: Text("点击重试", style: TextStyle(color: Colors.white),),
+                  ),
+                ),
+              ) :
+                   (comicVerticalMode
                       ? createVerticalReader()
-                      : createHorizontalReader()
+                      : createHorizontalReader())
                   : Center(
                       child: CircularProgressIndicator(),
                     ),
@@ -256,8 +265,9 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
         ? Positioned(child: Container())
         : Positioned(
             left: 0,
-            width: 60,
-            height: MediaQuery.of(context).size.height,
+            width: 80,
+            top: 0,
+            bottom: 0,
             child: InkWell(
               onTap: () {
                 if (Provider.of<AppSetting>(context, listen: false)
@@ -277,8 +287,9 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
         ? Positioned(child: Container())
         : Positioned(
             right: 0,
-            width: 60,
-            height: MediaQuery.of(context).size.height,
+            width: 80,
+            top: 0,
+            bottom: 0,
             child: InkWell(
               onTap: () {
                 if (Provider.of<AppSetting>(context, listen: false)
@@ -297,40 +308,40 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   Widget _createTopWidget() {
     return AnimatedPositioned(
       duration: Duration(milliseconds: 200),
-      width: _expand ? MediaQuery.of(context).size.width : _expandWidth,
-      child: Container(padding: EdgeInsets.only(
-            top: Provider.of<AppSetting>(context).comicReadShowStatusBar
-                ? 0
-                : MediaQuery.of(context).padding.top),
-        width: MediaQuery.of(context).size.width,
-        child: Material(
-            color: Color.fromARGB(255, 34, 34, 34),
-            child: ListTile(
-              dense: true,
-              title: Text(
-                widget.comicTitle,
-                style: TextStyle(color: Colors.white),
-              ),
-              subtitle: Text(
-                _currentItem.chapterTitle,
-                style: TextStyle(color: Colors.white),
-              ),
-              leading: BackButton(
-                color: Colors.white,
-              ),
-              trailing: IconButton(
-                  icon: Icon(
-                    Icons.share,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    Share.share(
-                        '${widget.comicTitle}-${_currentItem.chapterTitle}\r\nhttps://m.dmzj.com/view/${widget.comicId}/${_currentItem.chapterId}.html');
-                  }),
-            )),
-      ),
       top: _showControls ? 0 : -100,
       left: 0,
+      right: 0,
+      child: Container(
+            padding: EdgeInsets.only(
+                top: Provider.of<AppSetting>(context).comicReadShowStatusBar
+                    ? 0
+                    : MediaQuery.of(context).padding.top),
+            child: Material(
+                color: Color.fromARGB(255, 34, 34, 34),
+                child: ListTile(
+                  dense: true,
+                  title: Text(
+                    widget.comicTitle,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    _currentItem.chapterTitle,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  leading: BackButton(
+                    color: Colors.white,
+                  ),
+                  trailing: IconButton(
+                      icon: Icon(
+                        Icons.share,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        Share.share(
+                            '${widget.comicTitle}-${_currentItem.chapterTitle}\r\nhttps://m.dmzj.com/view/${widget.comicId}/${_currentItem.chapterId}.html');
+                      }),
+                )),
+          )
     );
   }
 
@@ -338,10 +349,11 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   Widget _createBottom() {
     return AnimatedPositioned(
       duration: Duration(milliseconds: 200),
-      width: _expand ? MediaQuery.of(context).size.width : _expandWidth,
+      bottom: _showControls ? 0 : -140,
+      left: 0,
+      right: 0,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        width: _expand ? MediaQuery.of(context).size.width : _expandWidth,
         color: Color.fromARGB(255, 34, 34, 34),
         child: Column(
           children: <Widget>[
@@ -439,8 +451,6 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
           ],
         ),
       ),
-      bottom: _showControls ? 0 : -140,
-      left: 0,
     );
   }
 
@@ -448,14 +458,15 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
     return AnimatedPositioned(
       duration: Duration(milliseconds: 200),
       width: 200,
+      top: 0,
+      bottom: 0,
+      right: _showChapters ? 0 : -200,
       child: Container(
-          height: MediaQuery.of(context).size.height,
           color: Color.fromARGB(255, 24, 24, 24),
           padding: EdgeInsets.only(
               top: Provider.of<AppSetting>(context).comicReadShowStatusBar
                   ? 0
                   : MediaQuery.of(context).padding.top),
-          width: MediaQuery.of(context).size.width,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -505,8 +516,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
               ),
             ],
           )),
-      top: 0,
-      right: _showChapters ? 0 : -200,
+
     );
   }
 
@@ -945,6 +955,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   }
 
   bool _loading = false;
+  bool _isError = false;
   ComicWebChapterDetail _detail;
   DefaultCacheManager _cacheManager = DefaultCacheManager();
 
@@ -955,6 +966,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
       }
       setState(() {
         _loading = true;
+        _isError = false;
       });
       var api = Api.comicChapterDetail(widget.comicId, _currentItem.chapterId);
 
@@ -1012,6 +1024,9 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
           widget.comicId, _currentItem.chapterId);
     } catch (e) {
       print(e);
+      setState(() {
+        _isError = true;
+      });
     } finally {
       setState(() {
         _loading = false;

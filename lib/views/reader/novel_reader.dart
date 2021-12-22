@@ -1,6 +1,7 @@
 // @dart=2.9
 
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -18,6 +19,7 @@ import 'package:flutter_dmzj/app/user_helper.dart';
 import 'package:flutter_dmzj/app/user_info.dart';
 import 'package:flutter_dmzj/app/utils.dart';
 import 'package:flutter_dmzj/models/novel/novel_volume_item.dart';
+import 'package:flutter_dmzj/views/other/platform_methods.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
@@ -44,7 +46,7 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
   //EventBus settingEvent = EventBus();
   List<String> _pageContents = ["加载中"];
   NovelVolumeChapterItem _currentItem;
-  Battery _battery = Battery();
+  Battery _battery = PlatformBattery();
   Uint8List _contents;
 
   double _verSliderMax = 0;
@@ -208,25 +210,25 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
                                 },
                                 child: Utils.createCacheImage(
                                     _pageContents[i - 1], 100, 100,
-                                    fit: BoxFit.fitWidth),
+                                    fit: BoxFit.contain),
                               ),
                             )
                           : Container(
                               color: AppSetting.bgColors[
-                                  Provider.of<AppSetting>(context)
-                                      .novelReadTheme],
+                                Provider.of<AppSetting>(context).novelReadTheme],
                               padding: EdgeInsets.fromLTRB(12, 12, 12, 24),
                               alignment: Alignment.topCenter,
-                              child: Text(
-                                _pageContents.length == 0
-                                    ? ""
-                                    : _pageContents[i - 1],
-                                style: TextStyle(
-                                    fontSize: _fontSize,
-                                    height: _lineHeight,
-                                    color: AppSetting.fontColors[
-                                        Provider.of<AppSetting>(context)
-                                            .novelReadTheme]),
+                              child: Container(
+                                constraints: BoxConstraints(maxWidth: 800),
+                                child: Text(
+                                  _pageContents.length == 0 ? "" : _pageContents[i - 1],
+                                  style: TextStyle(
+                                      fontSize: _fontSize,
+                                      height: _lineHeight,
+                                      color: AppSetting.fontColors[
+                                          Provider.of<AppSetting>(context)
+                                              .novelReadTheme]),
+                                ),
                               ),
                             );
                       return _widget;
@@ -567,7 +569,7 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
       previousChapter();
     } else {
       setState(() {
-        _controller.jumpToPage(_indexPage - 1);
+        _controller.animateToPage(_indexPage - 1, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
       });
     }
   }
@@ -577,7 +579,7 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
       nextChapter();
     } else {
       setState(() {
-        _controller.jumpToPage(_indexPage + 1);
+        _controller.animateToPage(_indexPage + 1, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
       });
     }
   }
@@ -925,7 +927,7 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
       return;
     }
     var i = DateTime.now().millisecondsSinceEpoch;
-    var width = window.physicalSize.width / window.devicePixelRatio;
+    var width = min<double>(window.physicalSize.width / window.devicePixelRatio, 800.0);
 
     var height = window.physicalSize.height / window.devicePixelRatio;
     var par = ComputeParameter(_contents, width, height,

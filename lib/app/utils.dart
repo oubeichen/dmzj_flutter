@@ -29,6 +29,7 @@ import 'package:flutter_dmzj/views/user/user_detail.dart';
 import 'package:flutter_dmzj/views/user/user_history.dart';
 import 'package:flutter_dmzj/views/user/user_subscribe.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
@@ -380,5 +381,11 @@ class Utils {
         ),
       ),
     );
+  }
+
+  static String getCurrentTime() {
+    DateTime now = DateTime.now();
+    var formatter = DateFormat('hh:mm');
+    return formatter.format(now);
   }
 }

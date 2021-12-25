@@ -244,19 +244,30 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   Widget _createReadStatus() {
     return Positioned(
       child: Provider.of<AppSetting>(context).comicReadShowstate
-          ? Container(
-              padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-              color: Color.fromARGB(255, 34, 34, 34),
-              child: Text(
-                _loading
-                    ? "${_currentItem.chapterTitle}  加载中 WIFI  100%电量"
-                    : "${_currentItem.chapterTitle}  $_selectIndex/${_detail.page_url.length}  $_networkState  $_batteryStr 电量",
-                style: TextStyle(color: Colors.white, fontSize: 12),
+          ? Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Container(
+                  padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                  color: Color.fromARGB(255, 34, 34, 34),
+                  child: Text(Utils.getCurrentTime(), style: TextStyle(color: Colors.white, fontSize: 12))),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                color: Color.fromARGB(255, 34, 34, 34),
+                child: Text(
+                  _loading
+                      ? "${_currentItem.chapterTitle}  加载中 WIFI  100%电量"
+                      : "${_currentItem.chapterTitle}  $_selectIndex/${_detail.page_url.length}  $_networkState  $_batteryStr 电量",
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
               ),
-            )
+            ],
+          )
           : Container(),
       bottom: 0,
       right: 0,
+      left: 0,
     );
   }
 

@@ -103,6 +103,8 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     UserHelper.comicAddNovelHistory(
         widget.novelId, _currentItem.volume_id, _currentItem.chapter_id);
+    print("page: ${_indexPage}");
+    ConfigHelper.setNovelHistoryPage(widget.novelId, _currentItem.chapter_id, _indexPage);
     super.dispose();
   }
 
@@ -140,17 +142,14 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
                 _showControls = !_showControls;
               });
             },
-            child: Provider.of<AppSetting>(context).novelReadDirection != 2
+            child: !context.novelVerticalMode
                 ? PageView.builder(
                     scrollDirection: Axis.horizontal,
-                    pageSnapping:
-                        Provider.of<AppSetting>(context).novelReadDirection !=
-                            2,
+                    pageSnapping: !context.novelVerticalMode,
                     controller: _controller,
                     itemCount: _pageContents.length + 2,
                     reverse:
-                        Provider.of<AppSetting>(context).novelReadDirection ==
-                            1,
+                        Provider.of<AppSetting>(context).novelReadDirection == 1,
                     onPageChanged: (i) {
                       if (i == _pageContents.length + 1 && !_loading) {
                         nextChapter();
@@ -214,8 +213,7 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
                               ),
                             )
                           : Container(
-                              color: AppSetting.bgColors[
-                                Provider.of<AppSetting>(context).novelReadTheme],
+                              color: AppSetting.bgColors[context.novelReadTheme],
                               padding: EdgeInsets.fromLTRB(12, 12, 12, 24),
                               alignment: Alignment.topCenter,
                               child: Container(
@@ -225,9 +223,7 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
                                   style: TextStyle(
                                       fontSize: _fontSize,
                                       height: _lineHeight,
-                                      color: AppSetting.fontColors[
-                                          Provider.of<AppSetting>(context)
-                                              .novelReadTheme]),
+                                      color: AppSetting.fontColors[context.novelReadTheme]),
                                 ),
                               ),
                             );
@@ -286,17 +282,16 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
                     ),
                   ),
           ),
-          Provider.of<AppSetting>(context).novelReadDirection == 2
+          context.novelVerticalMode
               ? Positioned(child: Container())
               : Positioned(
                   left: 0,
-                  width: 40,
-                  height: MediaQuery.of(context).size.height,
+                  width: 80,
+                  top: 0,
+                  bottom: 0,
                   child: InkWell(
                     onTap: () {
-                      if (Provider.of<AppSetting>(context, listen: false)
-                              .novelReadDirection ==
-                          1) {
+                      if (Provider.of<AppSetting>(context, listen: false).novelReadDirection == 1) {
                         previousPage();
                       } else {
                         nextPage();
@@ -305,17 +300,16 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
                     child: Container(),
                   ),
                 ),
-          Provider.of<AppSetting>(context).novelReadDirection == 2
+          context.novelVerticalMode
               ? Positioned(child: Container())
               : Positioned(
                   right: 0,
-                  width: 40,
-                  height: MediaQuery.of(context).size.height,
+                  width: 80,
+                  top: 0,
+                  bottom: 0,
                   child: InkWell(
                     onTap: () {
-                      if (Provider.of<AppSetting>(context, listen: false)
-                              .novelReadDirection ==
-                          1) {
+                      if (Provider.of<AppSetting>(context, listen: false).novelReadDirection == 1) {
                         nextPage();
                       } else {
                         previousPage();
@@ -325,13 +319,18 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
                   ),
                 ),
 
+          // 显示时间
+          Positioned(
+              bottom: 8,
+              left: 12,
+              child: Text(Utils.getCurrentTime(),
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+          )),
+
           Positioned(
             bottom: 8,
             right: 12,
-            child: Text(
-              Provider.of<AppSetting>(context).novelReadDirection == 2
-                  ? ""
-                  : "$_indexPage/${_pageContents.length} $_batteryStr电量",
+            child: Text("$_indexPage/${_pageContents.length} $_batteryStr电量",
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),
@@ -906,8 +905,8 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
           _isPicture = false;
         });
         _contents = bodyBytes;
-
-        await handelContent();
+        var page = ConfigHelper.getNovelHistoryPage(widget.novelId, _currentItem.chapter_id);
+        await handelContent(initPage: page);
       }
 
       ConfigHelper.setNovelHistory(widget.novelId, _currentItem.chapter_id);
@@ -922,7 +921,7 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
     }
   }
 
-  Future handelContent() async {
+  Future handelContent({int initPage = 0}) async {
     if (_isPicture) {
       return;
     }
@@ -938,6 +937,9 @@ class _NovelReaderPageState extends State<NovelReaderPage> {
       _pageContents = ls;
       _fontSize = ConfigHelper.getNovelFontSize();
       _lineHeight = ConfigHelper.getNovelLineHeight();
+      var realPage = max(min(_pageContents.length, initPage), 0);
+      _controller.jumpToPage(realPage);
+
     });
     print(DateTime.now().millisecondsSinceEpoch - i);
   }

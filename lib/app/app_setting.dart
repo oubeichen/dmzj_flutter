@@ -140,4 +140,10 @@ class AppSetting with ChangeNotifier {
 extension ContextExtension on BuildContext {
 
   bool get comicVerticalMode => Provider.of<AppSetting>(this).comicVerticalMode;
+
+  bool get novelVerticalMode => Provider.of<AppSetting>(this).novelReadDirection == 2;
+
+  bool get novelLetToRightModel => Provider.of<AppSetting>(this).novelReadDirection == 1;
+
+  int get novelReadTheme => Provider.of<AppSetting>(this).novelReadTheme;
 }

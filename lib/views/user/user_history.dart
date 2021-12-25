@@ -215,7 +215,7 @@ class _HistoryTabItemState extends State<HistoryTabItem>
                     ),
                     Text(
                         "看到" +
-                            item.volume_name +
+                            (item.volume_name ?? "") +
                             " · " +
                             (item.chapter_name ?? ""),
                         style: TextStyle(color: Colors.grey, fontSize: 14)),

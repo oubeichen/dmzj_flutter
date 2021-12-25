@@ -168,6 +168,14 @@ class ConfigHelper {
     prefs.setInt("novel$novelId", value);
   }
 
+  static void setNovelHistoryPage(int novelId, int chapterId, int page) {
+    prefs.setInt("novel$novelId#$chapterId", page);
+  }
+
+  static int getNovelHistoryPage(int novelId, int chapterId) {
+    return prefs.getInt("novel$novelId#$chapterId");
+  }
+
   /// 小说阅读主题
   static int getNovelTheme() {
     return prefs.getInt("NovelTheme") ?? 0;

@@ -65,6 +65,7 @@ dependencies:
   scrollable_positioned_list: ^0.2.3
   flutter_disk_lru_cache: ^1.0.1
   collection: ^1.15.0-nullsafety.4
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

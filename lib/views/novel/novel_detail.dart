@@ -153,12 +153,12 @@ class _NovelDetailPageState extends State<NovelDetailPage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
+                          SelectableText(
                             _detail.name,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 2),
-                          Text(
+                          SelectableText(
                             "作者:" + _detail.authors,
                             style: TextStyle(color: Colors.grey),
                           ),
@@ -204,7 +204,7 @@ class _NovelDetailPageState extends State<NovelDetailPage>
               children: <Widget>[
                 Text("简介", style: TextStyle(fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
-                Text(
+                SelectableText(
                   _detail.introduction,
                   style: TextStyle(color: Colors.grey),
                 ),

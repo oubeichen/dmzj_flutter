@@ -169,6 +169,7 @@ class UserHelper {
       var response = await http.get(Uri.parse(Api.addUserNovelHistory(
           novelId, volumeId, chapterId, uid,
           page: page)));
+      print("comicAddNovelHistory " + response.body);
       var jsonMap = jsonDecode(response.body);
       if (jsonMap["code"] == 0) {
         return true;

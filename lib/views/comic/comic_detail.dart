@@ -187,32 +187,32 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
+                            SelectableText(
                               _detail.title,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 2),
-                            Text(
+                            SelectableText(
                               "作者:" + tagsToString(_detail.authors ?? []),
                               style: TextStyle(color: Colors.grey),
                             ),
                             SizedBox(height: 2),
-                            Text(
+                            SelectableText(
                               "点击:" + _detail.hotNum.toString(),
                               style: TextStyle(color: Colors.grey),
                             ),
                             SizedBox(height: 2),
-                            Text(
+                            SelectableText(
                               "订阅:" + _detail.subscribeNum.toString(),
                               style: TextStyle(color: Colors.grey),
                             ),
                             SizedBox(height: 2),
-                            Text(
+                            SelectableText(
                               "状态:" + tagsToString(_detail.status ?? []),
                               style: TextStyle(color: Colors.grey),
                             ),
                             SizedBox(height: 2),
-                            Text(
+                            SelectableText(
                               "最后更新:" +
                                   DateUtil.formatDate(
                                       DateTime.fromMillisecondsSinceEpoch(
@@ -247,7 +247,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                 children: <Widget>[
                   Text("简介", style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 4),
-                  Text(
+                  SelectableText(
                     _detail.description,
                     style: TextStyle(color: Colors.grey),
                   ),
@@ -416,7 +416,6 @@ class _ComicDetailPageState extends State<ComicDetailPage>
           children: _related.author_comics
               .map<Widget>((f) => _getItem(f.author_name + "的其他作品", f.data,
                       icon: Icon(Icons.chevron_right),
-                      ratio: getWidth() / ((getWidth() * (360 / 270)) + 36),
                       ontap: () {
                     Utils.openPage(context, f.author_id, 8);
                   }))
@@ -425,14 +424,12 @@ class _ComicDetailPageState extends State<ComicDetailPage>
         _getItem(
           "同类题材作品",
           _related.theme_comics,
-          ratio: getWidth() / ((getWidth() * (360 / 270)) + 36),
         ),
         _related.novels != null && _related.novels.length != 0
             ? _getItem(
                 "相关小说",
                 _related.novels,
                 type: 2,
-                ratio: getWidth() / ((getWidth() * (360 / 270)) + 36),
               )
             : Container()
       ],
@@ -444,10 +441,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
       Function ontap,
       bool needSubTitle = true,
       int count = 3,
-      int type = 1,
-      double ratio = 3 / 5.2,
-      double imgWidth = 270,
-      double imgHeight = 360}) {
+      int type = 1,}) {
     return Offstage(
         offstage: items == null || items.length == 0,
         child: Column(
@@ -465,21 +459,31 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                   ),
                   ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: 600),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: ScrollPhysics(),
-                      itemCount: items.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: count,
-                          crossAxisSpacing: 4.0,
-                          mainAxisSpacing: 4.0,
-                          childAspectRatio: ratio),
-                      itemBuilder: (context, i) => _getComicItemBuilder(
-                          items[i].id, type, items[i].cover, items[i].name,
-                          author: needSubTitle ? items[i].status : "",
-                          url: '',
-                          width: imgWidth,
-                          height: imgHeight),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        var itemWidth = (constraints.maxWidth - (count - 1) * 4) / count;
+                        var imageRatio = 270 / 360;
+                        var imageWidth = itemWidth - 4 * 2;
+                        var imageHeight = itemWidth / imageRatio;
+                        var itemHeight = imageHeight + 4 * 2 + 44;
+
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          itemCount: items.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: count,
+                              crossAxisSpacing: 4.0,
+                              mainAxisSpacing: 4.0,
+                              childAspectRatio: itemWidth / itemHeight),
+                          itemBuilder: (context, i) => _getComicItemBuilder(
+                              items[i].id, type, items[i].cover, items[i].name,
+                              author: needSubTitle ? items[i].status : "",
+                              url: '',
+                              width: imageWidth,
+                              height: itemHeight),
+                        );
+                      }
                     ),
                   ),
                 ],
@@ -523,6 +527,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       padding: EdgeInsets.all(4),
       child: Container(
+        height: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[

@@ -205,36 +205,56 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
               })
           : null,
       body: Center(
-        child: Container(
-          constraints: _expand ? null : maxConstraints,
-          child: Stack(
-            children: <Widget>[
-              !_loading ? _isError ? Container(
-                child: Center(
-                  child: InkWell(
-                    onTap: (){
-                      loadData();
-                    },
-                    child: Text("点击重试", style: TextStyle(color: Colors.white),),
-                  ),
-                ),
-              ) :
-                   (comicVerticalMode
-                      ? createVerticalReader()
-                      : createHorizontalReader())
-                  : Center(
-                      child: CircularProgressIndicator(),
+        child: RawKeyboardListener(
+          onKey: (key){
+            if (key is RawKeyUpEvent) {
+              var isLeft = key.logicalKey == LogicalKeyboardKey.arrowLeft;
+              var isRight = key.logicalKey == LogicalKeyboardKey.arrowRight;
+              if (!isLeft && !isRight) {
+                return;
+              }
+              var isComicReadReverse = Provider.of<AppSetting>(context, listen: false)
+                  .comicReadReverse;
+              print("onKeyUp: isLeft:$isLeft, isRight:$isRight, isComicReadReverse:$isComicReadReverse");
+              if (isLeft) {
+                previousPage();
+              } else {
+                nextPage();
+              }
+            }
+          },
+          focusNode: FocusNode(),
+          child: Container(
+            constraints: _expand ? null : maxConstraints,
+            child: Stack(
+              children: <Widget>[
+                !_loading ? _isError ? Container(
+                  child: Center(
+                    child: InkWell(
+                      onTap: (){
+                        loadData();
+                      },
+                      child: Text("点击重试", style: TextStyle(color: Colors.white),),
                     ),
-              _createReadStatus(),
-              _createTurnPage1(),
-              _createTurnPage2(),
-              //顶部
-              _createTopWidget(),
-              //底部
-              _createBottom(),
-              //右侧章节选择
-              createLeftChapter(),
-            ],
+                  ),
+                ) :
+                     (comicVerticalMode
+                        ? createVerticalReader()
+                        : createHorizontalReader())
+                    : Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                _createReadStatus(),
+                _createTurnPage1(),
+                _createTurnPage2(),
+                //顶部
+                _createTopWidget(),
+                //底部
+                _createBottom(),
+                //右侧章节选择
+                createLeftChapter(),
+              ],
+            ),
           ),
         ),
       ),

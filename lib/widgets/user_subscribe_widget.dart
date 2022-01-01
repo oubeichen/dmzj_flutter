@@ -28,10 +28,8 @@ class _UserSubscribeWidgetState extends State<UserSubscribeWidget> {
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             physics: ScrollPhysics(),
             itemCount: widget.list.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: MediaQuery.of(context).size.width ~/ 160 < 3
-                    ? 3
-                    : MediaQuery.of(context).size.width ~/ 160,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 160,
                 crossAxisSpacing: 2.0,
                 mainAxisSpacing: 4.0,
                 childAspectRatio:

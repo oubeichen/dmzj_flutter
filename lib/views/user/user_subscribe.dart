@@ -17,6 +17,7 @@ import 'package:provider/provider.dart';
 
 class UserSubscribePage extends StatefulWidget {
   final int index;
+
   UserSubscribePage({Key key, this.index = 0}) : super(key: key);
 
   @override
@@ -51,6 +52,7 @@ class _UserSubscribeStatePage extends State<UserSubscribePage> {
 
 class SubscribeTabView extends StatefulWidget {
   final int type;
+
   SubscribeTabView(this.type, {Key key}) : super(key: key);
 
   @override
@@ -100,6 +102,7 @@ class _SubscribeTabViewState extends State<SubscribeTabView>
     "Y开头": "y",
     "Z开头": "z"
   };
+
   @override
   void setState(fn) {
     if (mounted) {
@@ -109,105 +112,108 @@ class _SubscribeTabViewState extends State<SubscribeTabView>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return EasyRefresh(
-      header: MaterialHeader(),
-      footer: MaterialFooter(),
-      child: SingleChildScrollView(
-        child: Column(
+    if (_loading && _page == 0) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return Column(
+      children: <Widget>[
+        SizedBox(height: 4),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            SizedBox(height: 4),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  child: PopupMenuButton<String>(
-                    child: Container(
-                      height: 36,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(_selectLetters == 0
-                              ? "字母筛选"
-                              : _letters.keys.toList()[_selectLetters]),
-                          Icon(
-                            Icons.arrow_drop_down,
-                            color: Colors.grey,
-                          )
-                        ],
-                      ),
-                    ),
-                    onSelected: (v) async {
-                      setState(() {
-                        _selectLetters = _letters.values.toList().indexOf(v);
-                      });
-                      _page = 0;
-                      await loadData();
-                    },
-                    itemBuilder: (c) => _letters.keys
-                        .map((f) => CheckedPopupMenuItem<String>(
-                              child: Text(f),
-                              value: _letters[f],
-                              checked: _selectLetters ==
-                                  _letters.keys.toList().indexOf(f),
-                            ))
-                        .toList(),
+            Expanded(
+              child: PopupMenuButton<String>(
+                child: Container(
+                  height: 36,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(_selectLetters == 0
+                          ? "字母筛选"
+                          : _letters.keys.toList()[_selectLetters]),
+                      Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.grey,
+                      )
+                    ],
                   ),
                 ),
-                Expanded(
-                    child: PopupMenuButton<int>(
+                onSelected: (v) async {
+                  setState(() {
+                    _selectLetters = _letters.values.toList().indexOf(v);
+                  });
+                  _page = 0;
+                  await loadData();
+                },
+                itemBuilder: (c) => _letters.keys
+                    .map((f) => CheckedPopupMenuItem<String>(
+                          child: Text(f),
+                          value: _letters[f],
+                          checked: _selectLetters ==
+                              _letters.keys.toList().indexOf(f),
+                        ))
+                    .toList(),
+              ),
+            ),
+            Expanded(
+                child: PopupMenuButton<int>(
                   child: Container(
-                      height: 36,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(_subTypes[_subType - 1]),
-                          Icon(
-                            Icons.arrow_drop_down,
-                            color: Colors.grey,
-                          )
-                        ],
-                      )),
+                  height: 36,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(_subTypes[_subType - 1]),
+                      Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.grey,
+                      )
+                    ],
+                  )),
                   onSelected: (v) async {
                     setState(() {
                       _subType = v;
                     });
                     _page = 0;
                     await loadData();
-                  },
+                    },
                   itemBuilder: (c) => _subTypes
                       .map((f) => CheckedPopupMenuItem<int>(
-                            child: Text(f),
-                            value: _subTypes.indexOf(f) + 1,
-                            checked: _subTypes.indexOf(f) + 1 == _subType,
-                          ))
-                      .toList(),
-                ))
-              ],
-            ),
-            _loading && _page == 0
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : UserSubscribeWidget(
-                    _list,
-                    type: widget.type,
-                  ),
+                        child: Text(f),
+                        value: _subTypes.indexOf(f) + 1,
+                        checked: _subTypes.indexOf(f) + 1 == _subType,
+                      ))
+                  .toList(),
+            ))
           ],
         ),
-      ),
-      onRefresh: () async {
-        _page = 0;
-
-        await loadData();
-      },
-      onLoad: loadData,
+        Expanded(
+          child: LayoutBuilder(builder: (context, con) {
+            print("LayoutBuilder::$con");
+            return EasyRefresh(
+              header: MaterialHeader(),
+              footer: MaterialFooter(),
+              child: UserSubscribeWidget(
+                _list,
+                type: widget.type,
+              ),
+              onRefresh: () async {
+                _page = 0;
+                await loadData();
+              },
+              onLoad: loadData,
+            );
+          }),
+        ),
+      ],
     );
   }
 
   List<SubscribeItem> _list = [];
   int _page = 0;
   bool _loading = false;
+
   Future loadData() async {
     try {
       if (_loading) {
@@ -217,7 +223,7 @@ class _SubscribeTabViewState extends State<SubscribeTabView>
       if (_page == 0 && _list.isEmpty) {
         final content = await DiskLruCacheManager.read(cacheKey);
         final list = getListFromStr(content);
-        if (list != null){
+        if (list != null) {
           setState(() {
             if (_page == 0) {
               _list.addAll(list);
@@ -268,16 +274,14 @@ class _SubscribeTabViewState extends State<SubscribeTabView>
   }
 
   List<SubscribeItem> getListFromStr(String content) {
-    try{
+    try {
       List jsonMap = jsonDecode(content);
       return jsonMap.map((f) => SubscribeItem.fromJson(f)).toList();
-    } catch(e) {
+    } catch (e) {
       print(e);
       return null;
     }
   }
 
-  void _updatePageDetails(int page, List<SubscribeItem> detail) {
-
-  }
+  void _updatePageDetails(int page, List<SubscribeItem> detail) {}
 }

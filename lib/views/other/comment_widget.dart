@@ -222,10 +222,8 @@ class _CommentWidgetState extends State<CommentWidget>
         padding: EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
         decoration: BoxDecoration(
             border: Border(
-          top: BorderSide(
-            color: Colors.grey.withOpacity(0.1),
-          ),
-        )),
+              top: BorderSide(color: Colors.grey.withOpacity(0.1),),
+            )),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -339,7 +337,7 @@ class _CommentWidgetState extends State<CommentWidget>
 
     List<Widget> items = [];
     if (list.length > 2) {
-      items.add(createMsterCommentItem(list.first));
+      items.add(createMasterCommentItem(list.first));
       items.add(InkWell(
         onTap: () {
           setState(() {
@@ -360,21 +358,27 @@ class _CommentWidgetState extends State<CommentWidget>
         ),
       ));
       items.add(SizedBox(height: 8));
-      items.add(createMsterCommentItem(list.last));
+      items.add(createMasterCommentItem(list.last));
     } else {
       for (var item in list) {
-        items.add(createMsterCommentItem(item));
+        items.add(createMasterCommentItem(item));
       }
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: items,
-    );
+    if (items.length == 0) {
+      return Container();
+    } else if (items.length == 1) {
+      return items.first;
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: items,
+      );
+    }
   }
 
   Widget createMasterCommentAll(List<MasterCommentItem> list) {
     List<Widget> items = list.map<Widget>((item) {
-      return createMsterCommentItem(item);
+      return createMasterCommentItem(item);
     }).toList();
 
     return Column(
@@ -383,7 +387,61 @@ class _CommentWidgetState extends State<CommentWidget>
     );
   }
 
-  Widget createMsterCommentItem(MasterCommentItem item) {
+  Widget createMasterCommentItem(MasterCommentItem item) {
+    var imageWidget = null;
+    if (item.upload_images != null && item.upload_images.length != 0) {
+      imageWidget = Padding(
+        padding: EdgeInsets.only(top: 8),
+        child: Wrap(
+          children: item.upload_images.split(",").map<Widget>((f) {
+            var str = f.split(".").toList();
+            var fileImg = str[0];
+            var fileImgSuffix = str[1];
+            return InkWell(
+              onTap: () => Utils.showImageViewDialog(context,
+                  "https://images.dmzj.com/commentImg/${item.obj_id % 500}/$f"),
+              child: Container(
+                width: 100,
+                child: Utils.createCacheImage(
+                    "https://images.dmzj.com/commentImg/${item.obj_id % 500}/${fileImg}_small.$fileImgSuffix",
+                    100,
+                    100),
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    }
+
+    Widget textWidget = RichText(
+      text: TextSpan(children: [
+        WidgetSpan(
+          child: InkWell(
+            child: Text(
+              item.nickname,
+              style: TextStyle(color: Theme.of(context).accentColor),
+            ),
+          ),
+        ),
+        TextSpan(
+            text: ": " + _htmlUnescape.convert(item.content),
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyText1.color))
+      ]),
+    );
+
+    Widget onlyComment;
+    if (imageWidget != null) {
+      onlyComment = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            textWidget,
+            imageWidget
+          ]);
+    } else {
+      onlyComment = textWidget;
+    }
+
     return Padding(
       padding: EdgeInsets.only(bottom: 8),
       child: InkWell(
@@ -421,51 +479,7 @@ class _CommentWidgetState extends State<CommentWidget>
               color: Colors.grey.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4)),
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              RichText(
-                text: TextSpan(children: [
-                  WidgetSpan(
-                    child: InkWell(
-                      child: Text(
-                        item.nickname,
-                        style: TextStyle(color: Theme.of(context).accentColor),
-                      ),
-                    ),
-                  ),
-                  TextSpan(
-                      text: ": " + _htmlUnescape.convert(item.content),
-                      style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyText1.color))
-                ]),
-              ),
-              item.upload_images != null && item.upload_images.length != 0
-                  ? Padding(
-                      padding: EdgeInsets.only(top: 8),
-                      child: Wrap(
-                        children:
-                            item.upload_images.split(",").map<Widget>((f) {
-                          var str = f.split(".").toList();
-                          var fileImg = str[0];
-                          var fileImgSuffix = str[1];
-                          return InkWell(
-                            onTap: () => Utils.showImageViewDialog(context,
-                                "https://images.dmzj.com/commentImg/${item.obj_id % 500}/$f"),
-                            child: Container(
-                              width: 100,
-                              child: Utils.createCacheImage(
-                                  "https://images.dmzj.com/commentImg/${item.obj_id % 500}/${fileImg}_small.$fileImgSuffix",
-                                  100,
-                                  100),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    )
-                  : Container(),
-            ],
-          ),
+          child: onlyComment,
         ),
       ),
     );

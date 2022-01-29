@@ -228,22 +228,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
             constraints: _expand ? null : maxConstraints,
             child: Stack(
               children: <Widget>[
-                !_loading ? _isError ? Container(
-                  child: Center(
-                    child: InkWell(
-                      onTap: (){
-                        loadData();
-                      },
-                      child: Text("点击重试", style: TextStyle(color: Colors.white),),
-                    ),
-                  ),
-                ) :
-                     (comicVerticalMode
-                        ? createVerticalReader()
-                        : createHorizontalReader())
-                    : Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                _createContent(),
                 _createReadStatus(),
                 _createTurnPage1(),
                 _createTurnPage2(),
@@ -259,6 +244,60 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
         ),
       ),
     );
+  }
+
+  Widget _createContent() {
+    if (_loading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (_isError) {
+      return Container(
+        child: Center(
+          child: InkWell(
+            onTap: (){
+              loadData();
+            },
+            child: Text("点击重试", style: TextStyle(color: Colors.white),),
+          ),
+        ),
+      );
+    }
+
+    Widget content = comicVerticalMode
+        ? createVerticalReader()
+        : createHorizontalReader();
+
+    return GestureDetector(
+        onLongPressStart: (details){
+          var globalPosition = details.globalPosition;
+          _showPopupMenu(globalPosition);
+        },
+        onSecondaryTapDown: (details){
+          var globalPosition = details.globalPosition;
+          print("onSecondaryTap....");
+          _showPopupMenu(globalPosition);
+        },
+        child: content);
+  }
+
+  void _showPopupMenu(Offset globalPosition) {
+    showMenu(context: context,
+        position: RelativeRect.fromLTRB(
+          globalPosition.dx,
+          globalPosition.dy,
+          globalPosition.dx,
+          globalPosition.dy,
+        ),
+        items: [
+          PopupMenuItem(value: "comment",child: Text("评论"),)
+        ]).then((value) => {
+          if (value == "comment") {
+              openTCPage()
+          }
+        });
   }
 
   Widget _createReadStatus() {
@@ -627,9 +666,8 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
       ItemPositionsListener.create();
 
   Widget createHorizontalReader() {
-    return GestureZoomBox(
-      onPressed: () {
-        print("GestureZoomBox onPressed::::");
+    return GestureDetector(
+      onTap: (){
         setState(() {
           if (_showChapters) {
             _showChapters = false;
@@ -638,8 +676,6 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
           _showControls = !_showControls;
         });
       },
-      maxScale: 5.0,
-      doubleTapScale: 2.0,
       child: Container(
         color: Colors.black,
         child: ComicView.builder(

@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dmzj/app/api.dart';
 import 'package:flutter_dmzj/app/utils.dart';
 import 'package:flutter_dmzj/models/comment_model.dart';
+import 'package:flutter_dmzj/widgets/ScrollPhysics.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -111,6 +112,7 @@ class _CommentWidgetState extends State<CommentWidget>
     return ListView.builder(
         controller: _controller,
         itemCount: _list.length + 1,
+        physics: MyScrollPhysics(),
         itemBuilder: (context, index) {
           if (index == 0) {
             return createTopFilter(text);

@@ -6,6 +6,7 @@ import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 
 Future initDatabase() async {
   var databasesPath = await databaseFactory.getDatabasesPath();
+  print("databasesPath: $databasesPath");
   // File(databasesPath+"/nsplayer.db").deleteSync();
   var db = await databaseFactory.openDatabase(databasesPath + "/comic_history.db",
           options: OpenDatabaseOptions(

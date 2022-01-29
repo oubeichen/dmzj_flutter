@@ -268,7 +268,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     );
   }
 
-  Widget createChpter() {
+  Widget createChapter() {
     return Scaffold(
       body: _detail.chapters != null && _detail.chapters.length != 0
           ? ListView.builder(
@@ -526,32 +526,31 @@ class _ComicDetailPageState extends State<ComicDetailPage>
           Utils.openPage(context, id, type, url: url, title: title),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       padding: EdgeInsets.all(4),
-      child: Container(
-        height: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Utils.createCacheImage(pic, width, height),
-            Padding(
-              padding: EdgeInsets.only(top: 4, bottom: 4),
-              child: Text(
-                title,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Utils.createCacheImage(pic, width, height),
+              Padding(
+                padding: EdgeInsets.only(top: 4, bottom: 4),
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                author,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.grey, fontSize: 12.0),
               ),
-            ),
-            author == ""
-                ? Container()
-                : Flexible(
-                    child: Text(
-                      author,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.grey, fontSize: 12.0),
-                    ),
-                  ),
-          ],
-        ),
+            ],
+          );
+        }
       ),
     );
   }
